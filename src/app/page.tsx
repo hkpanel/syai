@@ -1,14 +1,11 @@
 /**
- * SY.ai 메인 페이지
- * syai.co.kr 접속 시 첫 화면
- * DeepStock / DeepCrypto / DeepSoccer 서비스 소개
+ * SY.ai 메인 페이지 — D테마 (오렌지+레드)
  */
 "use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
-/* ─── 애니메이션 카운터 ─── */
 function AnimNum({ value, suffix = "" }: { value: number; suffix?: string }) {
   const [d, setD] = useState(0);
   useEffect(() => {
@@ -23,15 +20,13 @@ function AnimNum({ value, suffix = "" }: { value: number; suffix?: string }) {
   return <span>{d.toLocaleString()}{suffix}</span>;
 }
 
-/* ─── 서비스 카드 ─── */
 const SERVICES = [
   {
-    id: "deepstock", name: "DeepStock", icon: "📈", status: "LIVE", statusColor: "#00d4aa",
+    id: "deepstock", name: "DeepStock", icon: "📈", status: "LIVE", statusColor: "#FF6B35",
     desc: "한국투자증권 API 연동 자동매매",
     detail: "리밸런싱 + 차트매매 혼합 전략으로 국내 주식 자동 운용. 한투 API키만 등록하면 서버가 24시간 매매합니다.",
     features: ["자동 리밸런싱", "차트 시그널 매매", "실시간 포트폴리오", "매매 알림"],
-    href: "/deepstock",
-    gradient: "linear-gradient(135deg, #00d4aa, #00b894)",
+    href: "/deepstock", gradient: "linear-gradient(135deg, #FF6B35, #FF2E63)",
   },
   {
     id: "deepcrypto", name: "DeepCrypto", icon: "₿", status: "준비중", statusColor: "#f0b90b",
@@ -52,7 +47,6 @@ const SERVICES = [
 export default function HomePage() {
   const [vis, setVis] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
-
   useEffect(() => { setVis(true); }, []);
 
   return (
@@ -62,10 +56,10 @@ export default function HomePage() {
         .svc-card:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.12); }
       `}</style>
 
-      {/* ═══ 네비게이션 ═══ */}
+      {/* 네비게이션 */}
       <nav style={{
         position: "sticky", top: 0, zIndex: 100,
-        background: "rgba(8,8,12,0.85)", backdropFilter: "blur(20px)",
+        background: "rgba(12,8,8,0.85)", backdropFilter: "blur(20px)",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
       }}>
         <div style={{
@@ -75,29 +69,24 @@ export default function HomePage() {
           <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{
               fontSize: 22, fontWeight: 800, letterSpacing: "-0.5px",
-              background: "linear-gradient(135deg, #00d4aa, #00b894)",
+              background: "linear-gradient(135deg, #FF6B35, #FF2E63)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
             }}>SY.ai</span>
-            <span style={{
-              fontSize: 10, color: "#6b6b7e", border: "1px solid rgba(255,255,255,0.08)",
-              padding: "2px 6px", borderRadius: 4,
-            }}>BETA</span>
+            <span style={{ fontSize: 10, color: "#6b6b7e", border: "1px solid rgba(255,255,255,0.08)", padding: "2px 6px", borderRadius: 4 }}>BETA</span>
           </Link>
-          <div style={{ display: "flex", gap: 8 }}>
-            <Link href="/deepstock" style={{
-              padding: "8px 16px", borderRadius: 8, textDecoration: "none",
-              color: "#00d4aa", background: "rgba(0,212,170,0.08)", fontSize: 14, fontWeight: 500,
-            }}>📈 DeepStock</Link>
-          </div>
+          <Link href="/deepstock" style={{
+            padding: "8px 16px", borderRadius: 8, textDecoration: "none",
+            color: "#FF6B35", background: "rgba(255,107,53,0.08)", fontSize: 14, fontWeight: 500,
+          }}>📈 DeepStock</Link>
         </div>
       </nav>
 
-      {/* ═══ 히어로 ═══ */}
+      {/* 히어로 */}
       <section style={{ position: "relative", padding: "120px 24px 80px", textAlign: "center", overflow: "hidden" }}>
         <div style={{
           position: "absolute", top: "-50%", left: "50%", transform: "translateX(-50%)",
           width: 800, height: 800, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(0,212,170,0.08) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(255,107,53,0.1) 0%, transparent 70%)",
           animation: "heroGlow 6s ease infinite", pointerEvents: "none",
         }} />
         <div style={{
@@ -106,28 +95,24 @@ export default function HomePage() {
         }}>
           <div style={{
             display: "inline-block", padding: "6px 16px", borderRadius: 20,
-            background: "rgba(0,212,170,0.08)", border: "1px solid rgba(0,212,170,0.15)",
-            fontSize: 13, color: "#00d4aa", fontWeight: 500, marginBottom: 24,
-          }}>
-            AI x 투자 x 블록체인
-          </div>
+            background: "rgba(255,107,53,0.08)", border: "1px solid rgba(255,107,53,0.2)",
+            fontSize: 13, color: "#FF6B35", fontWeight: 500, marginBottom: 24,
+          }}>AI x 투자 x 블록체인</div>
           <h1 style={{ fontSize: "clamp(36px, 6vw, 64px)", fontWeight: 800, lineHeight: 1.15, letterSpacing: "-1.5px", marginBottom: 20 }}>
             <span style={{ color: "#e8e8ed" }}>투자의 미래,</span><br />
             <span style={{
-              background: "linear-gradient(135deg, #00d4aa, #00e4bb, #7cf5d3)",
+              background: "linear-gradient(135deg, #FF6B35, #FF2E63, #FFB088)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
             }}>AI가 운용합니다</span>
           </h1>
           <p style={{ fontSize: "clamp(15px, 2vw, 18px)", color: "#6b6b7e", lineHeight: 1.7, maxWidth: 560, margin: "0 auto 40px" }}>
-            한국투자증권 API 연동 자동매매부터<br />
-            암호화폐 시그널, 스포츠 AI 예측까지.<br />
-            SYC 코인으로 결제하면 최대 30% 할인.
+            한국투자증권 API 연동 자동매매부터<br />암호화폐 시그널, 스포츠 AI 예측까지.<br />SYC 코인으로 결제하면 최대 30% 할인.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             <Link href="/deepstock" style={{
               padding: "14px 32px", borderRadius: 12, textDecoration: "none",
-              background: "linear-gradient(135deg, #00d4aa, #00b894)",
-              color: "#08080c", fontWeight: 700, fontSize: 15,
+              background: "linear-gradient(135deg, #FF6B35, #FF2E63)",
+              color: "#fff", fontWeight: 700, fontSize: 15,
             }}>DeepStock 시작하기 →</Link>
             <Link href="https://www.sykoreapanel.com/syc" style={{
               padding: "14px 32px", borderRadius: 12, textDecoration: "none",
@@ -135,8 +120,6 @@ export default function HomePage() {
             }}>SYC 코인 알아보기</Link>
           </div>
         </div>
-
-        {/* 통계 */}
         <div style={{
           display: "flex", justifyContent: "center", gap: 48, marginTop: 80, flexWrap: "wrap",
           opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(30px)",
@@ -148,7 +131,7 @@ export default function HomePage() {
             { label: "전략 자동 실행", value: 24, suffix: "시간" },
           ].map((s, i) => (
             <div key={i} style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 36, fontWeight: 800, color: "#00d4aa", marginBottom: 4 }}>
+              <div style={{ fontSize: 36, fontWeight: 800, color: "#FF6B35", marginBottom: 4 }}>
                 <AnimNum value={s.value} suffix={s.suffix} />
               </div>
               <div style={{ fontSize: 13, color: "#6b6b7e" }}>{s.label}</div>
@@ -157,7 +140,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ 서비스 카드 ═══ */}
+      {/* 서비스 카드 */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px 100px" }}>
         <div style={{ textAlign: "center", marginBottom: 60 }}>
           <h2 style={{ fontSize: 32, fontWeight: 700, color: "#e8e8ed", marginBottom: 12 }}>AI 서비스 라인업</h2>
@@ -179,12 +162,11 @@ export default function HomePage() {
               <div style={{
                 position: "absolute", top: -60, right: -60, width: 160, height: 160,
                 borderRadius: "50%", background: svc.gradient, opacity: hovered === svc.id ? 0.12 : 0.06,
-                transition: "opacity 0.4s",
               }} />
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
                 <div style={{
                   width: 52, height: 52, borderRadius: 14, background: svc.gradient,
-                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, opacity: 0.9,
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
                 }}>{svc.icon}</div>
                 <div style={{
                   display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 6,
@@ -210,7 +192,7 @@ export default function HomePage() {
                 ))}
               </div>
               {svc.status === "LIVE" ? (
-                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, fontWeight: 600, color: "#00d4aa" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, fontWeight: 600, color: "#FF6B35" }}>
                   시작하기 <span style={{ fontSize: 18 }}>→</span>
                 </div>
               ) : (
@@ -221,35 +203,30 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ SYC 배너 ═══ */}
+      {/* SYC 배너 */}
       <section style={{ maxWidth: 1200, margin: "0 auto 80px", padding: "0 24px" }}>
         <div style={{
-          background: "linear-gradient(135deg, rgba(0,212,170,0.08), rgba(0,184,148,0.04))",
-          border: "1px solid rgba(0,212,170,0.12)", borderRadius: 20,
+          background: "linear-gradient(135deg, rgba(255,107,53,0.08), rgba(255,46,99,0.04))",
+          border: "1px solid rgba(255,107,53,0.12)", borderRadius: 20,
           padding: "40px 32px", display: "flex", alignItems: "center",
           justifyContent: "space-between", flexWrap: "wrap", gap: 20,
         }}>
           <div>
-            <h3 style={{ fontSize: 22, fontWeight: 700, color: "#e8e8ed", marginBottom: 8 }}>
-              SYC 코인으로 결제하면 최대 30% 할인
-            </h3>
-            <p style={{ fontSize: 14, color: "#8b8b9e" }}>
-              충전금을 SYC 코인으로 결제하면 원화 대비 20~30% 할인된 가격으로 서비스를 이용할 수 있습니다.
-            </p>
+            <h3 style={{ fontSize: 22, fontWeight: 700, color: "#e8e8ed", marginBottom: 8 }}>SYC 코인으로 결제하면 최대 30% 할인</h3>
+            <p style={{ fontSize: 14, color: "#8b8b9e" }}>충전금을 SYC 코인으로 결제하면 원화 대비 20~30% 할인된 가격으로 서비스를 이용할 수 있습니다.</p>
           </div>
           <Link href="https://www.sykoreapanel.com/syc" style={{
             padding: "12px 28px", borderRadius: 12, textDecoration: "none",
-            background: "linear-gradient(135deg, #00d4aa, #00b894)",
-            color: "#08080c", fontWeight: 700, fontSize: 14, whiteSpace: "nowrap",
+            background: "linear-gradient(135deg, #FF6B35, #FF2E63)",
+            color: "#fff", fontWeight: 700, fontSize: 14, whiteSpace: "nowrap",
           }}>SYC 구매하기</Link>
         </div>
       </section>
 
-      {/* ═══ 푸터 ═══ */}
+      {/* 푸터 */}
       <footer style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "32px 24px", textAlign: "center" }}>
         <div style={{ fontSize: 12, color: "#4a4a5e", lineHeight: 1.8 }}>
           SY.ai는 투자 자문 서비스가 아닙니다. 모든 투자 판단은 본인 책임 하에 이루어져야 합니다.<br />
-          과거 수익률이 미래 수익을 보장하지 않습니다. 원금 손실 위험이 있습니다.<br />
           © 2026 SY.ai · SY한국판넬 · SY Coin Project
         </div>
       </footer>

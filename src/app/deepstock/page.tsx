@@ -48,15 +48,15 @@ export default function DeepStockPage() {
   const [tab, setTab] = useState<"overview" | "strategy" | "history">("overview");
 
   return (
-    <div style={{ minHeight: "100vh", background: "#08080c", color: "#e8e8ed" }}>
+    <div style={{ minHeight: "100vh", background: "#0c0808", color: "#e8e8ed" }}>
       <style>{`
         .ds-tab { padding: 10px 20px; border: none; background: none; color: #6b6b7e; font-size: 14px;
           font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
         .ds-tab:hover { color: #e8e8ed; }
-        .ds-tab.active { color: #00d4aa; border-bottom-color: #00d4aa; }
+        .ds-tab.active { color: #FF6B35; border-bottom-color: #FF6B35; }
         .ds-btn { padding: 10px 20px; border: none; border-radius: 10px; font-size: 13px; font-weight: 600;
           cursor: pointer; transition: all 0.2s; }
-        .ds-btn-green { background: linear-gradient(135deg, #00d4aa, #00b894); color: #08080c; }
+        .ds-btn-green { background: linear-gradient(135deg, #FF6B35, #FF2E63); color: #fff; }
         .ds-btn-red { background: rgba(255,107,107,0.12); color: #ff6b6b; }
         .ds-btn-outline { background: none; border: 1px solid rgba(255,255,255,0.1); color: #e8e8ed; }
         .h-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 12px;
@@ -82,7 +82,7 @@ export default function DeepStockPage() {
           <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{
               fontSize: 22, fontWeight: 800, letterSpacing: "-0.5px",
-              background: "linear-gradient(135deg, #00d4aa, #00b894)",
+              background: "linear-gradient(135deg, #FF6B35, #FF2E63)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
             }}>SY.ai</span>
           </Link>
@@ -90,9 +90,9 @@ export default function DeepStockPage() {
             <div style={{
               display: "flex", alignItems: "center", gap: 6,
               padding: "6px 12px", borderRadius: 8,
-              background: "rgba(0,212,170,0.08)", border: "1px solid rgba(0,212,170,0.15)",
+              background: "rgba(255,107,53,0.08)", border: "1px solid rgba(255,107,53,0.15)",
             }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#00d4aa" }}>충전금 ₩0</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#FF6B35" }}>충전금 ₩0</span>
             </div>
           </div>
         </div>
@@ -150,8 +150,8 @@ export default function DeepStockPage() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 24 }}>
               {[
                 { label: "총 평가금액", value: "₩12,450,000", color: "#e8e8ed" },
-                { label: "총 수익률", value: "+4.28%", color: "#00d4aa" },
-                { label: "오늘 수익", value: "+₩85,000", color: "#00d4aa" },
+                { label: "총 수익률", value: "+4.28%", color: "#FF6B35" },
+                { label: "오늘 수익", value: "+₩85,000", color: "#FF6B35" },
                 { label: "충전금 잔액", value: "₩48,200", color: "#f0b90b" },
               ].map((s, i) => (
                 <div key={i} style={{
@@ -183,10 +183,10 @@ export default function DeepStockPage() {
                         <div style={{ fontSize: 11, color: "#6b6b7e" }}>{h.code}</div>
                       </div>
                       <div style={{ textAlign: "right", color: "#e8e8ed", fontWeight: 500 }}>₩{h.curPrice.toLocaleString()}</div>
-                      <div style={{ textAlign: "right", fontWeight: 600, color: plus ? "#00d4aa" : "#ff6b6b" }}>{plus ? "+" : ""}{pnl}%</div>
+                      <div style={{ textAlign: "right", fontWeight: 600, color: plus ? "#FF6B35" : "#ff6b6b" }}>{plus ? "+" : ""}{pnl}%</div>
                       <div className="hm" style={{ textAlign: "right", color: "#8b8b9e" }}>{h.qty}주</div>
                       <div className="hm" style={{ textAlign: "right" }}>
-                        <span style={{ padding: "2px 8px", borderRadius: 4, background: "rgba(0,212,170,0.08)", color: "#00d4aa", fontSize: 12 }}>{h.ratio}%</span>
+                        <span style={{ padding: "2px 8px", borderRadius: 4, background: "rgba(255,107,53,0.08)", color: "#FF6B35", fontSize: 12 }}>{h.ratio}%</span>
                       </div>
                     </div>
                   );
@@ -202,8 +202,8 @@ export default function DeepStockPage() {
                       <div style={{
                         width: 32, height: 32, borderRadius: 8, display: "flex",
                         alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700,
-                        background: t.type === "매수" ? "rgba(0,212,170,0.1)" : t.type === "매도" ? "rgba(255,107,107,0.1)" : "rgba(240,185,11,0.1)",
-                        color: t.type === "매수" ? "#00d4aa" : t.type === "매도" ? "#ff6b6b" : "#f0b90b",
+                        background: t.type === "매수" ? "rgba(255,107,53,0.1)" : t.type === "매도" ? "rgba(255,107,107,0.1)" : "rgba(240,185,11,0.1)",
+                        color: t.type === "매수" ? "#FF6B35" : t.type === "매도" ? "#ff6b6b" : "#f0b90b",
                       }}>{t.type === "매수" ? "B" : t.type === "매도" ? "S" : "R"}</div>
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 500, color: "#e8e8ed" }}>{t.name}</div>
@@ -224,8 +224,8 @@ export default function DeepStockPage() {
               <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "8px 0" }}>
                 <div style={{
                   width: 10, height: 10, borderRadius: "50%",
-                  background: strategyRunning ? "#00d4aa" : "#6b6b7e",
-                  boxShadow: strategyRunning ? "0 0 12px rgba(0,212,170,0.4)" : "none",
+                  background: strategyRunning ? "#FF6B35" : "#6b6b7e",
+                  boxShadow: strategyRunning ? "0 0 12px rgba(255,107,53,0.4)" : "none",
                 }} />
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 600, color: "#e8e8ed" }}>
@@ -271,17 +271,17 @@ export default function DeepStockPage() {
                 <button className="ds-btn ds-btn-green" style={{ flex: 1 }} onClick={() => setKisRegistered(true)}>API키 저장</button>
               </div>
               <div style={{ marginTop: 16, padding: "12px 16px", borderRadius: 8, background: "rgba(255,255,255,0.02)", fontSize: 12, color: "#6b6b7e", lineHeight: 1.7 }}>
-                아직 API키가 없으시다면? <a href="https://apiportal.koreainvestment.com" target="_blank" style={{ color: "#00d4aa" }}>KIS Developers 바로가기 →</a>
+                아직 API키가 없으시다면? <a href="https://apiportal.koreainvestment.com" target="_blank" style={{ color: "#FF6B35" }}>KIS Developers 바로가기 →</a>
               </div>
             </Card>
 
             <Card title="전략 선택">
               <div style={{
-                padding: 20, borderRadius: 12, border: "2px solid rgba(0,212,170,0.2)",
-                background: "rgba(0,212,170,0.03)", marginBottom: 16,
+                padding: 20, borderRadius: 12, border: "2px solid rgba(255,107,53,0.2)",
+                background: "rgba(255,107,53,0.03)", marginBottom: 16,
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                  <span style={{ padding: "4px 8px", borderRadius: 4, fontSize: 11, fontWeight: 700, background: "rgba(0,212,170,0.12)", color: "#00d4aa" }}>추천</span>
+                  <span style={{ padding: "4px 8px", borderRadius: 4, fontSize: 11, fontWeight: 700, background: "rgba(255,107,53,0.12)", color: "#FF6B35" }}>추천</span>
                   <span style={{ fontSize: 16, fontWeight: 700, color: "#e8e8ed" }}>리밸런싱 + 차트매매 혼합</span>
                 </div>
                 <p style={{ fontSize: 13, color: "#8b8b9e", lineHeight: 1.7 }}>
@@ -289,7 +289,7 @@ export default function DeepStockPage() {
                 </p>
                 <div style={{ display: "flex", gap: 6, marginTop: 12, flexWrap: "wrap" }}>
                   {["자동 리밸런싱", "이동평균 크로스", "RSI 과매수/과매도", "손절/익절 자동"].map((t) => (
-                    <span key={t} style={{ padding: "3px 8px", borderRadius: 4, fontSize: 11, background: "rgba(0,212,170,0.08)", color: "#00d4aa" }}>{t}</span>
+                    <span key={t} style={{ padding: "3px 8px", borderRadius: 4, fontSize: 11, background: "rgba(255,107,53,0.08)", color: "#FF6B35" }}>{t}</span>
                   ))}
                 </div>
               </div>
