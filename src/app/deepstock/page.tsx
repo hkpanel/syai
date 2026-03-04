@@ -2,6 +2,7 @@
  * DeepStock 대시보드
  * /deepstock 경로
  * 한투 API키 등록 + 포트폴리오 + 전략 + 매매이력
+ * v2: 수수료 0.05% 반영
  */
 "use client";
 
@@ -35,17 +36,18 @@ const MOCK_HOLDINGS = [
   { code: "006400", name: "삼성SDI", qty: 4, avgPrice: 420000, curPrice: 410000, ratio: 10 },
 ];
 
+// 수수료: 거래금액 × 0.05%
 const MOCK_TRADES = [
-  { time: "14:32", type: "매수", name: "삼성전자", qty: 2, price: 74500, fee: 149 },
-  { time: "13:15", type: "매도", name: "카카오", qty: 5, price: 52300, fee: 262 },
-  { time: "10:02", type: "매수", name: "SK하이닉스", qty: 1, price: 191500, fee: 192 },
-  { time: "09:31", type: "리밸런싱", name: "포트폴리오 #1", qty: 0, price: 0, fee: 500 },
+  { time: "14:32", type: "매수", name: "삼성전자", qty: 2, price: 74500, fee: 75 },   // 149,000 × 0.05%
+  { time: "13:15", type: "매도", name: "카카오", qty: 5, price: 52300, fee: 131 },    // 261,500 × 0.05%
+  { time: "10:02", type: "매수", name: "SK하이닉스", qty: 1, price: 191500, fee: 96 }, // 191,500 × 0.05%
+  { time: "09:31", type: "리밸런싱", name: "포트폴리오 #1", qty: 0, price: 0, fee: 830 },
 ];
 
 export default function DeepStockPage() {
   const [kisRegistered, setKisRegistered] = useState(false);
   const [strategyRunning, setStrategyRunning] = useState(false);
-  const [tab, setTab] = useState<"overview" | "strategy" | "history">("overview");
+  const [tab, setTab] = useState<"overview" | "strategy" | "fee" | "history">("overview");
 
   return (
     <div style={{ minHeight: "100vh", background: "#0c0808", color: "#e8e8ed" }}>
@@ -104,7 +106,7 @@ export default function DeepStockPage() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8, flexWrap: "wrap", gap: 12 }}>
           <div>
             <h1 style={{ fontSize: 28, fontWeight: 700, color: "#e8e8ed" }}>DeepStock</h1>
-            <p style={{ fontSize: 13, color: "#6b6b7e", marginTop: 4 }}>한국투자증권 API 연동 자동매매</p>
+            <p style={{ fontSize: 13, color: "#6b6b7e", marginTop: 4 }}>국내 ETF AI 자동 리밸런싱 | 한국투자증권 API 연동</p>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             {strategyRunning ? (
@@ -120,9 +122,9 @@ export default function DeepStockPage() {
 
         {/* 탭 */}
         <div style={{ display: "flex", gap: 4, marginBottom: 28, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-          {(["overview", "strategy", "history"] as const).map((t) => (
+          {(["overview", "strategy", "fee", "history"] as const).map((t) => (
             <button key={t} className={`ds-tab ${tab === t ? "active" : ""}`} onClick={() => setTab(t)}>
-              {{ overview: "📊 대시보드", strategy: "🎯 전략 설정", history: "📋 매매 이력" }[t]}
+              {{ overview: "📊 대시보드", strategy: "🎯 전략 설정", fee: "💰 수수료", history: "📋 매매 이력" }[t]}
             </button>
           ))}
         </div>
@@ -216,6 +218,13 @@ export default function DeepStockPage() {
                     </div>
                   </div>
                 ))}
+                <div style={{
+                  marginTop: 12, padding: "10px 14px", borderRadius: 8,
+                  background: "rgba(255,255,255,0.02)", display: "flex", justifyContent: "space-between",
+                }}>
+                  <span style={{ fontSize: 12, color: "#6b6b7e" }}>오늘 총 수수료</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "#FF6B35" }}>₩{MOCK_TRADES.reduce((s, t) => s + t.fee, 0).toLocaleString()}</span>
+                </div>
               </Card>
             </div>
 
@@ -232,7 +241,7 @@ export default function DeepStockPage() {
                     {strategyRunning ? "전략 실행 중" : "전략 정지됨"}
                   </div>
                   <div style={{ fontSize: 12, color: "#6b6b7e" }}>
-                    {strategyRunning ? "리밸런싱 + 차트매매 혼합 전략 | 다음 체크: 15:00"
+                    {strategyRunning ? "리밸런싱 + AI 시장분석 혼합 전략 | 다음 체크: 15:00"
                       : kisRegistered ? "전략 시작 버튼을 눌러주세요" : "한투 API키를 먼저 등록해주세요"}
                   </div>
                 </div>
@@ -261,7 +270,7 @@ export default function DeepStockPage() {
                     <input type={f.type} placeholder={f.placeholder} style={{
                       width: "100%", padding: "12px 16px", borderRadius: 10,
                       border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)",
-                      color: "#e8e8ed", fontSize: 14, outline: "none",
+                      color: "#e8e8ed", fontSize: 14, outline: "none", boxSizing: "border-box" as const,
                     }} />
                   </div>
                 ))}
@@ -275,28 +284,139 @@ export default function DeepStockPage() {
               </div>
             </Card>
 
-            <Card title="전략 선택">
+            <Card title="전략 프로파일 선택">
+              {[
+                {
+                  name: "안정형 (Conservative)",
+                  badge: null,
+                  target: "연 8~12% 목표",
+                  mdd: "MDD -15% 이내",
+                  desc: "커버드콜 월배당 ETF 중심. 채권 포함으로 변동성을 낮추고 꾸준한 현금흐름을 추구합니다.",
+                },
+                {
+                  name: "균형형 (Balanced)",
+                  badge: "추천",
+                  target: "연 15~25% 목표",
+                  mdd: "MDD -25% 이내",
+                  desc: "S&P500 성장성 + 배당 안정성 혼합. 가장 많은 투자자가 선택하는 균형 잡힌 전략입니다.",
+                },
+                {
+                  name: "공격형 (Aggressive)",
+                  badge: null,
+                  target: "연 25%+ 목표",
+                  mdd: "MDD -35% 각오",
+                  desc: "나스닥·테크 섹터 집중. 변동성을 감수하고 장기 최대 수익을 추구합니다.",
+                },
+              ].map((p, i) => (
+                <div key={i} style={{
+                  padding: 20, borderRadius: 12, marginBottom: 12,
+                  border: p.badge ? "2px solid rgba(255,107,53,0.2)" : "1px solid rgba(255,255,255,0.06)",
+                  background: p.badge ? "rgba(255,107,53,0.03)" : "rgba(255,255,255,0.01)",
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                    {p.badge && (
+                      <span style={{ padding: "3px 8px", borderRadius: 4, fontSize: 11, fontWeight: 700, background: "rgba(255,107,53,0.12)", color: "#FF6B35" }}>{p.badge}</span>
+                    )}
+                    <span style={{ fontSize: 15, fontWeight: 700, color: "#e8e8ed" }}>{p.name}</span>
+                  </div>
+                  <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                    <span style={{ fontSize: 12, color: "#FF6B35", padding: "2px 8px", background: "rgba(255,107,53,0.08)", borderRadius: 4 }}>{p.target}</span>
+                    <span style={{ fontSize: 12, color: "#6b6b7e", padding: "2px 8px", background: "rgba(255,255,255,0.04)", borderRadius: 4 }}>{p.mdd}</span>
+                  </div>
+                  <p style={{ fontSize: 13, color: "#6b6b7e", lineHeight: 1.7 }}>{p.desc}</p>
+                </div>
+              ))}
+              <p style={{ fontSize: 11, color: "#4a4a5e", lineHeight: 1.7, marginTop: 8 }}>
+                ※ 레버리지 ETF는 모든 프로파일에서 제외됩니다.<br />
+                ※ 과거 시뮬레이션 수익률은 미래 수익을 보장하지 않습니다.
+              </p>
+            </Card>
+          </div>
+        )}
+
+        {/* ═══ 수수료 탭 ═══ */}
+        {tab === "fee" && (
+          <div style={{ maxWidth: 720 }}>
+            {/* 기본 수수료 */}
+            <Card title="💰 기본 수수료" style={{ marginBottom: 20 }}>
               <div style={{
-                padding: 20, borderRadius: 12, border: "2px solid rgba(255,107,53,0.2)",
-                background: "rgba(255,107,53,0.03)", marginBottom: 16,
+                textAlign: "center", padding: "32px 0", marginBottom: 24,
+                borderBottom: "1px solid rgba(255,255,255,0.04)",
               }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                  <span style={{ padding: "4px 8px", borderRadius: 4, fontSize: 11, fontWeight: 700, background: "rgba(255,107,53,0.12)", color: "#FF6B35" }}>추천</span>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: "#e8e8ed" }}>리밸런싱 + 차트매매 혼합</span>
-                </div>
-                <p style={{ fontSize: 13, color: "#8b8b9e", lineHeight: 1.7 }}>
-                  목표 비율대로 포트폴리오를 자동 리밸런싱하면서, 차트 시그널(이동평균, RSI 등)을 활용해 매매 타이밍을 최적화합니다.
-                </p>
-                <div style={{ display: "flex", gap: 6, marginTop: 12, flexWrap: "wrap" }}>
-                  {["자동 리밸런싱", "이동평균 크로스", "RSI 과매수/과매도", "손절/익절 자동"].map((t) => (
-                    <span key={t} style={{ padding: "3px 8px", borderRadius: 4, fontSize: 11, background: "rgba(255,107,53,0.08)", color: "#FF6B35" }}>{t}</span>
-                  ))}
-                </div>
+                <div style={{ fontSize: 56, fontWeight: 800, color: "#FF6B35", letterSpacing: "-1px" }}>0.05%</div>
+                <div style={{ fontSize: 15, color: "#8b8b9e", marginTop: 10 }}>매수 · 매도 · 리밸런싱 동일 적용</div>
               </div>
-              <div style={{ padding: 20, borderRadius: 12, border: "1px solid rgba(255,255,255,0.06)", opacity: 0.5 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ padding: "4px 8px", borderRadius: 4, fontSize: 11, fontWeight: 700, background: "rgba(255,255,255,0.06)", color: "#6b6b7e" }}>준비중</span>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: "#8b8b9e" }}>모멘텀 팩터 전략</span>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {[
+                  { label: "1,000만원 매수 시", value: "수수료 5,000원" },
+                  { label: "500만원 매도 시", value: "수수료 2,500원" },
+                  { label: "리밸런싱으로 인한 매매", value: "동일 수수료 적용" },
+                ].map((ex) => (
+                  <div key={ex.label} style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    padding: "14px 18px", borderRadius: 10, background: "rgba(255,255,255,0.02)",
+                    border: "1px solid rgba(255,255,255,0.04)",
+                  }}>
+                    <span style={{ fontSize: 14, color: "#8b8b9e" }}>{ex.label}</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: "#e8e8ed" }}>{ex.value}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{
+                marginTop: 20, padding: "14px 18px", borderRadius: 10,
+                background: "rgba(240,185,11,0.04)", border: "1px solid rgba(240,185,11,0.1)",
+              }}>
+                <p style={{ fontSize: 13, color: "#8b8b9e", lineHeight: 1.7 }}>
+                  ⚠️ DeepStock 수수료는 SY.ai 플랫폼 이용 수수료입니다.<br />
+                  한국투자증권 자체 거래 수수료(약 0.015%)는 별도 부과됩니다.
+                </p>
+              </div>
+            </Card>
+
+            {/* 크레딧 충전 */}
+            <Card title="💳 크레딧 충전 방식">
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <div style={{
+                  padding: 20, borderRadius: 14, background: "rgba(255,255,255,0.02)",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                    <div>
+                      <div style={{ fontSize: 16, fontWeight: 700, color: "#e8e8ed", marginBottom: 4 }}>🏦 원화 결제</div>
+                      <div style={{ fontSize: 13, color: "#6b6b7e" }}>카드 · 무통장 입금 (PortOne PG 연동)</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 18, fontWeight: 800, color: "#4a90d9" }}>1:1</div>
+                      <div style={{ fontSize: 12, color: "#6b6b7e" }}>만원 → 10,000 크레딧</div>
+                    </div>
+                  </div>
+                </div>
+                <div style={{
+                  padding: 20, borderRadius: 14, background: "rgba(255,107,53,0.04)",
+                  border: "2px solid rgba(255,107,53,0.15)",
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: "#e8e8ed" }}>🪙 SYC 코인 결제</div>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "#FF6B35", padding: "2px 8px", background: "rgba(255,107,53,0.12)", borderRadius: 4 }}>추천</span>
+                      </div>
+                      <div style={{ fontSize: 13, color: "#6b6b7e" }}>MetaMask 연동 (PancakeSwap 시세 기준)</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 18, fontWeight: 800, color: "#FF6B35" }}>20~30%</div>
+                      <div style={{ fontSize: 12, color: "#FF6B35" }}>할인 적용</div>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 12, color: "#8b8b9e", lineHeight: 1.7, marginTop: 10 }}>
+                    SYC 코인으로 충전하면 원화 대비 20~30% 할인된 크레딧을 받을 수 있습니다.<br />
+                    PancakeSwap 현재 시세 기준으로 자동 계산됩니다.
+                  </div>
+                  <a href="https://www.sykoreapanel.com/syc" target="_blank" style={{
+                    display: "inline-block", marginTop: 14, padding: "8px 16px", borderRadius: 8,
+                    background: "linear-gradient(135deg, #FF6B35, #FF2E63)", color: "#fff",
+                    fontSize: 13, fontWeight: 600, textDecoration: "none",
+                  }}>SYC 코인 구매하기 →</a>
                 </div>
               </div>
             </Card>
