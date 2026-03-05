@@ -142,10 +142,8 @@ export default function HomePage() {
             <span style={{ background: "linear-gradient(135deg,#FF6B35,#FF2E63)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>읽고, 기억하고, 진화하는 AI</span>
           </h1>
           <p style={{ fontSize: "clamp(13px,1.5vw,16px)", color: "#f0b90b", fontWeight: 600, marginBottom: 20 }}>어려운 기술을 모르셔도 괜찮습니다.</p>
-          <p className="hs" style={{ fontSize: "clamp(14px,1.8vw,18px)", color: "#8b8b9e", lineHeight: 1.8, maxWidth: 660, margin: "0 auto 36px" }}>
-            4개의 독립 AI 엔진이 시장 온도 · 뉴스 감성 · 공포지수를 24시간 분석하고,<br />
-            <strong style={{ color: "#e8e8ed" }}>1,072+개 ETF</strong>를 실시간 스캔하여 당신의 투자 성향에 맞는<br />
-            최적의 포트폴리오를 제안합니다.
+          <p className="hs" style={{ fontSize: "clamp(13px,1.6vw,17px)", color: "#8b8b9e", lineHeight: 1.8, maxWidth: 660, margin: "0 auto 36px" }}>
+            4개의 독립 AI 엔진이 시장 온도 · 뉴스 감성 · 공포지수를 24시간 분석하고, <strong style={{ color: "#e8e8ed" }}>1,072+개 ETF</strong>를 실시간 스캔하여 당신의 투자 성향에 맞는 최적의 포트폴리오를 제안합니다.
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap", marginBottom: 48 }}>
             <a href="#download" style={{ padding: "14px 36px", borderRadius: 12, textDecoration: "none", background: "linear-gradient(135deg,#FF6B35,#FF2E63)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 32px rgba(255,107,53,0.3)" }}>프로그램 다운로드</a>
