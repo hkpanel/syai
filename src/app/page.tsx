@@ -179,26 +179,26 @@ export default function HomePage() {
       </nav>
 
       {/* HERO */}
-      <section style={{ position: "relative", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", overflow: "hidden" }}>
+      <section style={{ position: "relative", paddingTop: "clamp(100px,14vh,160px)", paddingBottom: "clamp(60px,10vh,120px)", textAlign: "center", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translate(-50%,-50%)", width: "clamp(300px,60vw,700px)", height: "clamp(300px,60vw,700px)", borderRadius: "50%", background: "radial-gradient(circle,rgba(255,107,53,0.08) 0%,transparent 70%)", pointerEvents: "none" }} />
         <div style={{ position: "relative", zIndex: 1, maxWidth: 900, margin: "0 auto", padding: "0 24px", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(30px)", transition: "all 1s ease" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 20, background: "rgba(100,210,109,0.08)", border: "1px solid rgba(100,210,109,0.2)", marginBottom: 14 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 20, background: "rgba(100,210,109,0.08)", border: "1px solid rgba(100,210,109,0.2)", marginBottom: 18 }}>
             <div className="pd" />
             <span style={{ fontSize: 12, color: "#64d26d", fontWeight: 600 }}>AI 엔진 가동중 · 주식 · 코인 · 스포츠 AI 분석</span>
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 6, marginBottom: 24 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 6, marginBottom: "clamp(24px,4vh,40px)" }}>
             {["FinBERT", "LSTM", "강화학습", "앙상블", "상관관계 네트워크"].map(t => (
               <span key={t} style={{ fontSize: 10, padding: "3px 10px", borderRadius: 20, background: "rgba(255,107,53,0.06)", border: "1px solid rgba(255,107,53,0.12)", color: "#FF6B35", fontWeight: 600 }}>{t}</span>
             ))}
           </div>
-          <h1 className="ht" style={{ fontSize: "clamp(28px,5vw,52px)", fontWeight: 800, lineHeight: 1.15, letterSpacing: "-1px", marginBottom: 16 }}>
+          <h1 className="ht" style={{ fontSize: "clamp(28px,5vw,52px)", fontWeight: 800, lineHeight: 1.15, letterSpacing: "-1px", marginBottom: "clamp(16px,3vh,28px)" }}>
             <span style={{ background: "linear-gradient(135deg,#FF6B35,#FF2E63)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>읽고, 기억하고, 진화하는 AI</span>
           </h1>
-          <p style={{ fontSize: "clamp(13px,1.5vw,16px)", color: "#f0b90b", fontWeight: 600, marginBottom: 20 }}>어려운 기술을 모르셔도 괜찮습니다.</p>
-          <p className="hs" style={{ fontSize: "clamp(13px,1.6vw,17px)", color: "#8b8b9e", lineHeight: 1.8, maxWidth: 660, margin: "0 auto 36px" }}>
+          <p style={{ fontSize: "clamp(13px,1.5vw,16px)", color: "#f0b90b", fontWeight: 600, marginBottom: "clamp(16px,3vh,24px)" }}>어려운 기술을 모르셔도 괜찮습니다.</p>
+          <p className="hs" style={{ fontSize: "clamp(13px,1.6vw,17px)", color: "#8b8b9e", lineHeight: 1.8, maxWidth: 660, margin: `0 auto clamp(32px,5vh,48px)` }}>
             4개의 독립 AI 엔진이 시장 온도 · 뉴스 감성 · 공포지수를 24시간 분석하고, <strong style={{ color: "#e8e8ed" }}>1,072+개 ETF</strong>를 실시간 스캔하여 당신의 투자 성향에 맞는 최적의 포트폴리오를 제안합니다.
           </p>
-          <div style={{ display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap", marginBottom: 40 }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap", marginBottom: "clamp(32px,5vh,48px)" }}>
             <a href="#download" style={{ padding: "14px 36px", borderRadius: 12, textDecoration: "none", background: "linear-gradient(135deg,#FF6B35,#FF2E63)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 32px rgba(255,107,53,0.3)" }}>프로그램 다운로드</a>
             <a href="#backtest" style={{ padding: "14px 36px", borderRadius: 12, textDecoration: "none", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "#e8e8ed", fontWeight: 600, fontSize: 15 }}>수익률 확인 ↓</a>
           </div>
