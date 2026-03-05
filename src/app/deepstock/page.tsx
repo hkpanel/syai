@@ -142,6 +142,7 @@ export default function DeepStockPage() {
         .h-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 12px;
           padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04); align-items: center; }
         .h-row:last-child { border-bottom: none; }
+        .tip-wrap:hover .tip-box { display: block !important; }
         @media (max-width: 768px) {
           .h-row { grid-template-columns: 1.5fr 1fr 1fr; font-size: 12px; }
           .h-row .hm { display: none; }
@@ -365,27 +366,54 @@ export default function DeepStockPage() {
                 })}
               </div>
 
-              {/* API키 입력 폼 */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {[
-                  { label: "HTS ID", placeholder: "한투 HTS 로그인 ID", type: "text", key: "htsId" },
-                  { label: "AppKey", placeholder: "36자리 AppKey", type: "password", key: "appKey" },
-                  { label: "AppSecret", placeholder: "180자리 AppSecret", type: "password", key: "appSecret" },
-                  { label: "계좌번호", placeholder: "00000000-01", type: "text", key: "accountNo" },
-                ].map((f) => (
-                  <div key={f.label}>
-                    <label style={{ fontSize: 12, color: "#6b6b7e", display: "block", marginBottom: 4 }}>{f.label}</label>
-                    <input type={f.type} placeholder={f.placeholder}
-                      value={kisForm[f.key as keyof typeof kisForm]}
-                      onChange={(e) => setKisForm(prev => ({ ...prev, [f.key]: e.target.value }))}
-                      style={{
-                        width: "100%", padding: "12px 16px", borderRadius: 10,
-                        border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)",
-                        color: "#e8e8ed", fontSize: 14, outline: "none", boxSizing: "border-box" as const,
-                      }} />
+              {/* 모드에 따른 콘텐츠 */}
+              {(kisMode || "mock") === "mock" ? (
+                <div style={{ padding: "32px 20px", textAlign: "center", background: "rgba(255,255,255,0.02)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div style={{ fontSize: 36, marginBottom: 12 }}>🎮</div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: "#e8e8ed", marginBottom: 8 }}>모의투자 모드</div>
+                  <p style={{ fontSize: 13, color: "#6b6b7e", lineHeight: 1.8 }}>
+                    실제 자금 없이 AI 전략을 테스트할 수 있습니다.<br />
+                    가상 잔고로 동일한 리밸런싱 로직이 적용됩니다.<br />
+                    실전 전환은 언제든 가능합니다.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* API키 입력 폼 + 툴팁 */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    {[
+                      { label: "HTS ID", placeholder: "한투 HTS 로그인 ID", type: "text", key: "htsId",
+                        tip: "💻 PC: 한국투자증권 홈페이지 로그인 시 사용하는 아이디\n📱 모바일: 한국투자 앱 > 설정 > 내 정보에서 확인" },
+                      { label: "AppKey", placeholder: "36자리 AppKey", type: "password", key: "appKey",
+                        tip: "💻 PC: apiportal.koreainvestment.com > 로그인 > API신청 > 발급받은 AppKey 복사\n📱 모바일: 한국투자 앱 > 트레이딩 > Open API > KIS Developers에서 확인" },
+                      { label: "AppSecret", placeholder: "180자리 AppSecret", type: "password", key: "appSecret",
+                        tip: "💻 PC: apiportal.koreainvestment.com > 로그인 > API신청 > 발급받은 AppSecret 복사\n📱 모바일: 한국투자 앱 > 트레이딩 > Open API > KIS Developers에서 확인" },
+                      { label: "계좌번호", placeholder: "00000000-01", type: "text", key: "accountNo",
+                        tip: "💻 PC: 한국투자증권 홈페이지 > 계좌관리에서 확인 (8자리-2자리 형식)\n📱 모바일: 한국투자 앱 > 메인 상단 계좌번호 확인" },
+                    ].map((f) => (
+                      <div key={f.label} style={{ position: "relative" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                          <label style={{ fontSize: 12, color: "#6b6b7e" }}>{f.label}</label>
+                          <div style={{ position: "relative", display: "inline-block" }} className="tip-wrap">
+                            <span style={{ fontSize: 12, color: "#4a4a5e", cursor: "help", border: "1px solid #4a4a5e", borderRadius: "50%", width: 16, height: 16, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>?</span>
+                            <div className="tip-box" style={{ display: "none", position: "absolute", left: 0, top: 22, zIndex: 10, width: 300, padding: "12px 14px", borderRadius: 10, background: "#2a2a2e", border: "1px solid rgba(255,255,255,0.1)", fontSize: 12, color: "#c8c8d0", lineHeight: 1.7, whiteSpace: "pre-line", boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}>
+                              {f.tip}
+                            </div>
+                          </div>
+                        </div>
+                        <input type={f.type} placeholder={f.placeholder}
+                          value={kisForm[f.key as keyof typeof kisForm]}
+                          onChange={(e) => setKisForm(prev => ({ ...prev, [f.key]: e.target.value }))}
+                          style={{
+                            width: "100%", padding: "12px 16px", borderRadius: 10,
+                            border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)",
+                            color: "#e8e8ed", fontSize: 14, outline: "none", boxSizing: "border-box" as const,
+                          }} />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </>
+              )}
 
               {/* 저장 버튼 */}
               <button className="ds-btn ds-btn-green" disabled={kisSaving}
@@ -394,9 +422,11 @@ export default function DeepStockPage() {
                 {kisSaving ? "저장 중..." : "저장"}
               </button>
 
-              <div style={{ marginTop: 16, padding: "12px 16px", borderRadius: 8, background: "rgba(255,255,255,0.02)", fontSize: 12, color: "#6b6b7e", lineHeight: 1.7 }}>
-                아직 API키가 없으시다면? <a href="https://apiportal.koreainvestment.com" target="_blank" style={{ color: "#FF6B35" }}>KIS Developers 바로가기 →</a>
-              </div>
+              {(kisMode || "mock") === "real" && (
+                <div style={{ marginTop: 16, padding: "12px 16px", borderRadius: 8, background: "rgba(255,255,255,0.02)", fontSize: 12, color: "#6b6b7e", lineHeight: 1.7 }}>
+                  아직 API키가 없으시다면? <a href="https://apiportal.koreainvestment.com" target="_blank" style={{ color: "#FF6B35" }}>KIS Developers 바로가기 →</a>
+                </div>
+              )}
             </Card>
 
             <Card title="전략 프로파일 선택">
