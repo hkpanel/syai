@@ -140,7 +140,7 @@ export default function HomePage() {
         *{margin:0;padding:0;box-sizing:border-box}
         .gc{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;transition:all .4s cubic-bezier(.22,1,.36,1)}
         .gc:hover{border-color:rgba(255,107,53,0.2);transform:translateY(-4px)}
-        .gl{height:1px;background:linear-gradient(90deg,transparent,rgba(255,107,53,0.4),transparent);margin:clamp(28px,4vh,44px) auto;max-width:600px}
+        .gl{height:1px;background:linear-gradient(90deg,transparent,rgba(255,107,53,0.4),transparent);margin:clamp(16px,2.5vh,32px) auto;max-width:600px}
         .pd{width:8px;height:8px;border-radius:50%;background:#64d26d;animation:pd 2s infinite}
         @keyframes pd{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
         @keyframes su{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
@@ -157,7 +157,8 @@ export default function HomePage() {
           .gc{padding:18px!important}
           section{margin-bottom:36px!important}
           h2,h3,p,div{word-break:keep-all!important}
-          .hero-wrap{padding-bottom:88px!important}
+          .hero-wrap{padding-bottom:60px!important}
+          .sr{margin-top:48px!important}
         }
       `}</style>
 
@@ -180,7 +181,7 @@ export default function HomePage() {
       </nav>
 
       {/* HERO */}
-      <section className="hero-wrap" style={{ position: "relative", paddingTop: "clamp(100px,14vh,160px)", paddingBottom: "clamp(72px,12vh,140px)", textAlign: "center", overflow: "hidden" }}>
+      <section className="hero-wrap" style={{ position: "relative", paddingTop: "clamp(100px,14vh,160px)", paddingBottom: "clamp(48px,8vh,80px)", textAlign: "center", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translate(-50%,-50%)", width: "clamp(300px,60vw,700px)", height: "clamp(300px,60vw,700px)", borderRadius: "50%", background: "radial-gradient(circle,rgba(255,107,53,0.08) 0%,transparent 70%)", pointerEvents: "none" }} />
         <div style={{ position: "relative", zIndex: 1, maxWidth: 900, margin: "0 auto", padding: "0 24px", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(30px)", transition: "all 1s ease" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 20, background: "rgba(100,210,109,0.08)", border: "1px solid rgba(100,210,109,0.2)", marginBottom: 18 }}>
