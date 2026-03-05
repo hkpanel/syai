@@ -156,7 +156,7 @@ export default function HomePage() {
           .cs{flex-direction:column!important}
           .gc{padding:18px!important} .gl{margin:32px auto!important}
           section{margin-bottom:36px!important}
-          .mob-sm{font-size:11px!important} .mob-md{font-size:13px!important}
+          h2,h3,p,div{word-break:keep-all!important}
         }
       `}</style>
 
@@ -179,7 +179,7 @@ export default function HomePage() {
       </nav>
 
       {/* HERO */}
-      <section style={{ position: "relative", paddingTop: 100, paddingBottom: 56, textAlign: "center", overflow: "hidden" }}>
+      <section style={{ position: "relative", paddingTop: 110, paddingBottom: 72, textAlign: "center", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translate(-50%,-50%)", width: "clamp(300px,60vw,700px)", height: "clamp(300px,60vw,700px)", borderRadius: "50%", background: "radial-gradient(circle,rgba(255,107,53,0.08) 0%,transparent 70%)", pointerEvents: "none" }} />
         <div style={{ position: "relative", zIndex: 1, maxWidth: 900, margin: "0 auto", padding: "0 24px", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(30px)", transition: "all 1s ease" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 20, background: "rgba(100,210,109,0.08)", border: "1px solid rgba(100,210,109,0.2)", marginBottom: 14 }}>
@@ -198,7 +198,7 @@ export default function HomePage() {
           <p className="hs" style={{ fontSize: "clamp(13px,1.6vw,17px)", color: "#8b8b9e", lineHeight: 1.8, maxWidth: 660, margin: "0 auto 36px" }}>
             4개의 독립 AI 엔진이 시장 온도 · 뉴스 감성 · 공포지수를 24시간 분석하고, <strong style={{ color: "#e8e8ed" }}>1,072+개 ETF</strong>를 실시간 스캔하여 당신의 투자 성향에 맞는 최적의 포트폴리오를 제안합니다.
           </p>
-          <div style={{ display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap", marginBottom: 48 }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap", marginBottom: 40 }}>
             <a href="#download" style={{ padding: "14px 36px", borderRadius: 12, textDecoration: "none", background: "linear-gradient(135deg,#FF6B35,#FF2E63)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 32px rgba(255,107,53,0.3)" }}>프로그램 다운로드</a>
             <a href="#backtest" style={{ padding: "14px 36px", borderRadius: 12, textDecoration: "none", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "#e8e8ed", fontWeight: 600, fontSize: 15 }}>수익률 확인 ↓</a>
           </div>
@@ -250,14 +250,12 @@ export default function HomePage() {
           <div style={{ fontSize: 40, marginBottom: 16 }}>🤖</div>
           <h2 style={{ fontSize: "clamp(20px,3vw,28px)", fontWeight: 800, marginBottom: 8 }}>SY.ai — AI 투자 분석 도구</h2>
           <p style={{ fontSize: "clamp(12px,1.4vw,15px)", color: "#8b8b9e", lineHeight: 1.8, marginBottom: 24 }}>
-            내 PC에 설치하고, 내 API 키로, 내가 직접 실행합니다.<br />
-            AI가 분석하고 제안하지만 <strong style={{ color: "#e8e8ed" }}>최종 투자 결정은 항상 본인</strong>입니다.<br />
-            자동 업데이트 지원 · 가벼운 코어 + 플러그인 구조
+            내 PC에 설치하고, 내 API 키로, 내가 직접 실행합니다. AI가 분석하고 제안하지만 <strong style={{ color: "#e8e8ed" }}>최종 투자 결정은 항상 본인</strong>입니다. 자동 업데이트 지원 · 가벼운 코어 + 플러그인 구조
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
             <a href="#" style={{ padding: "14px 32px", borderRadius: 12, textDecoration: "none", background: "linear-gradient(135deg,#FF6B35,#FF2E63)", color: "#fff", fontWeight: 700, fontSize: 14, boxShadow: "0 8px 32px rgba(255,107,53,0.3)" }}>Windows 다운로드 (준비중)</a>
           </div>
-          <div style={{ marginTop: 16, display: "flex", justifyContent: "center", gap: 24, fontSize: 11, color: "#6b6b7e" }}>
+          <div style={{ marginTop: 16, display: "flex", justifyContent: "center", gap: 20, fontSize: 11, color: "#6b6b7e", flexWrap: "wrap" }}>
             <span>✅ 자동 업데이트</span>
             <span>✅ 내 PC에서 실행</span>
             <span>✅ API 키 본인 관리</span>
@@ -271,8 +269,9 @@ export default function HomePage() {
       <section style={{ maxWidth: 1200, margin: "0 auto 56px", padding: "0 24px" }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <div style={{ display: "inline-block", padding: "3px 11px", borderRadius: 20, background: "rgba(255,107,53,0.06)", border: "1px solid rgba(255,107,53,0.15)", fontSize: 11, color: "#FF6B35", fontWeight: 600, marginBottom: 12, letterSpacing: 1 }}>AI 자동 선정</div>
-          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>1,072+개 중 AI가 고른 최적의 7종</h2>
-          <p style={{ fontSize: "clamp(12px,1.4vw,15px)", color: "#6b6b7e" }}>시가총액 · 거래량 · NAV 괴리율 종합 분석 {etfUpdated && <span style={{ fontSize: 10, color: "#4a4a5e" }}>({etfUpdated} 업데이트)</span>}</p>
+          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8, wordBreak: "keep-all" }}>1,072+개 중 AI가 고른 최적의 7종</h2>
+          <p style={{ fontSize: "clamp(12px,1.4vw,15px)", color: "#6b6b7e" }}>시가총액 · 거래량 · NAV 괴리율 종합 분석</p>
+          {etfUpdated && <p style={{ fontSize: 11, color: "#4a4a5e", marginTop: 4 }}>({etfUpdated} 업데이트)</p>}
         </div>
         <div className="g7" style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 10 }}>
           {etfSel.map((e, i) => (
@@ -297,7 +296,8 @@ export default function HomePage() {
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "3px 11px", borderRadius: 20, background: "rgba(100,210,109,0.06)", border: "1px solid rgba(100,210,109,0.15)", fontSize: 11, color: "#64d26d", fontWeight: 600, marginBottom: 12, letterSpacing: 1 }}>
             <div className="pd" style={{ width: 6, height: 6 }} />LIVE · AI 시장 분석
           </div>
-          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>AI가 지금 이 순간도 시장을 보고 있습니다 {signalUpdated && <span style={{ fontSize: 11, color: "#4a4a5e", fontWeight: 500 }}>({signalUpdated} 업데이트)</span>}</h2>
+          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 4 }}>AI가 지금 이 순간도 시장을 보고 있습니다</h2>
+          {signalUpdated && <p style={{ fontSize: 12, color: "#4a4a5e", marginBottom: 0 }}>({signalUpdated} 업데이트)</p>}
         </div>
         <div className="g2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, maxWidth: 900, margin: "0 auto" }}>
           <div className="gc" style={{ padding: 28 }}>
@@ -431,7 +431,7 @@ export default function HomePage() {
         <div className="gc" style={{ padding: "32px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, background: "linear-gradient(135deg,rgba(255,107,53,0.06),rgba(255,46,99,0.03))", borderColor: "rgba(255,107,53,0.12)" }}>
           <div>
             <h3 style={{ fontSize: "clamp(15px,2.2vw,19px)", fontWeight: 700, marginBottom: 6 }}>SYC 코인으로 결제하면 최대 30% 할인</h3>
-            <p style={{ fontSize: "clamp(11px,1.3vw,13px)", color: "#8b8b9e" }}>수수료 0.05% · SYC 결제 시 추가 할인 · 숨겨진 비용 없음</p>
+            <p style={{ fontSize: "clamp(11px,1.3vw,13px)", color: "#8b8b9e", wordBreak: "keep-all" }}>수수료 0.05% · SYC 결제 시 추가 할인 · 숨겨진 비용 없음</p>
           </div>
           <Link href="https://www.sykoreapanel.com/syc" style={{ padding: "10px 22px", borderRadius: 10, textDecoration: "none", background: "linear-gradient(135deg,#FF6B35,#FF2E63)", color: "#fff", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap" }}>SYC 알아보기</Link>
         </div>
