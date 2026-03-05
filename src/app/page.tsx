@@ -10,6 +10,9 @@ import { onAuthChange, signOut } from "@/lib/auth";
 import type { User } from "firebase/auth";
 import AuthModal from "@/app/components/AuthModal";
 
+import { db } from "@/lib/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
+
 function AnimNum({ value, suffix = "" }: { value: number; suffix?: string }) {
   const [d, setD] = useState(0);
   useEffect(() => {
@@ -30,8 +33,9 @@ const BACKTEST = [
   { year: "2026", ds: 248, bank: 116, sp: 198 },
 ];
 
-const AI_LIVE = {
+const DEFAULT_AI_LIVE = {
   regime: "sideways", regimeKr: "횡보장", score: -0.06, fearGreed: 42, vix: 22.4,
+  action: "hold", updatedAt: "",
   signals: [
     { name: "시장 온도", score: -0.10, icon: "🌡️" },
     { name: "뉴스 감성", score: -0.20, icon: "📰" },
@@ -40,7 +44,7 @@ const AI_LIVE = {
   ],
 };
 
-const ETF_SEL = [
+const DEFAULT_ETF_SEL = [
   { cat: "S&P500", name: "TIGER 미국S&P500", cap: "14.9조", score: 0.995, color: "#FF6B35" },
   { cat: "나스닥", name: "TIGER 미국나스닥100", cap: "8.0조", score: 0.819, color: "#FF2E63" },
   { cat: "커버드콜", name: "KODEX 200타겟위클리커버드콜", cap: "3.3조", score: 0.728, color: "#f0b90b" },
@@ -74,8 +78,57 @@ export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
   const [showAuth, setShowAuth] = useState(false);
   const [activeTab, setActiveTab] = useState("deepstock");
+  const [aiLive, setAiLive] = useState(DEFAULT_AI_LIVE);
+  const [etfSel, setEtfSel] = useState(DEFAULT_ETF_SEL);
+  const [etfUpdated, setEtfUpdated] = useState("");
+  const [signalUpdated, setSignalUpdated] = useState("");
   useEffect(() => { setVis(true); }, []);
   useEffect(() => { const u = onAuthChange(setUser); return () => u(); }, []);
+
+  // Firestore 실시간 구독 — AI 분석 결과
+  useEffect(() => {
+    try {
+      const unsub = onSnapshot(doc(db, "syai", "live-signal"), (snap) => {
+        if (snap.exists()) {
+          const d = snap.data();
+          setAiLive({
+            regime: d.regime || "sideways",
+            regimeKr: d.regimeKr || "분석중",
+            score: d.score ?? 0,
+            fearGreed: d.fearGreed ?? 50,
+            vix: d.vix ?? 20,
+            action: d.action || "hold",
+            updatedAt: d.updatedAt || "",
+            signals: d.signals || DEFAULT_AI_LIVE.signals,
+          });
+          if (d.updatedAt) {
+            const dt = new Date(d.updatedAt);
+            setSignalUpdated(dt.toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }));
+          }
+        }
+      });
+      return () => unsub();
+    } catch { /* Firestore 미연결 시 기본값 사용 */ }
+  }, []);
+
+  // Firestore 실시간 구독 — ETF 선정 결과
+  useEffect(() => {
+    try {
+      const unsub = onSnapshot(doc(db, "syai", "etf-selection"), (snap) => {
+        if (snap.exists()) {
+          const d = snap.data();
+          if (d.selected && d.selected.length > 0) {
+            setEtfSel(d.selected);
+          }
+          if (d.updatedAt) {
+            const dt = new Date(d.updatedAt);
+            setEtfUpdated(dt.toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }));
+          }
+        }
+      });
+      return () => unsub();
+    } catch { /* Firestore 미연결 시 기본값 사용 */ }
+  }, []);
 
   const rc: Record<string, string> = { bull: "#64d26d", bear: "#FF2E63", crisis: "#FF2E63", sideways: "#f0b90b" };
   const re: Record<string, string> = { bull: "🟢", bear: "🔴", crisis: "🔴", sideways: "🟡" };
@@ -219,10 +272,10 @@ export default function HomePage() {
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <div style={{ display: "inline-block", padding: "3px 11px", borderRadius: 20, background: "rgba(255,107,53,0.06)", border: "1px solid rgba(255,107,53,0.15)", fontSize: 11, color: "#FF6B35", fontWeight: 600, marginBottom: 12, letterSpacing: 1 }}>AI 자동 선정</div>
           <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>1,072+개 중 AI가 고른 최적의 7종</h2>
-          <p style={{ fontSize: "clamp(12px,1.4vw,15px)", color: "#6b6b7e" }}>시가총액 · 거래량 · NAV 괴리율 종합 분석 <span style={{ fontSize: 10, color: "#4a4a5e" }}>(2026.03.05 15:57 업데이트)</span></p>
+          <p style={{ fontSize: "clamp(12px,1.4vw,15px)", color: "#6b6b7e" }}>시가총액 · 거래량 · NAV 괴리율 종합 분석 {etfUpdated && <span style={{ fontSize: 10, color: "#4a4a5e" }}>({etfUpdated} 업데이트)</span>}</p>
         </div>
         <div className="g7" style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 10 }}>
-          {ETF_SEL.map((e, i) => (
+          {etfSel.map((e, i) => (
             <div key={i} className="gc" style={{ padding: 16, textAlign: "center", animation: `su .5s ease ${i * .08}s both` }}>
               <div style={{ fontSize: 10, color: e.color, fontWeight: 700, marginBottom: 6 }}>{e.cat}</div>
               <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 4, lineHeight: 1.3, minHeight: 32 }}>{e.name}</div>
@@ -244,36 +297,36 @@ export default function HomePage() {
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "3px 11px", borderRadius: 20, background: "rgba(100,210,109,0.06)", border: "1px solid rgba(100,210,109,0.15)", fontSize: 11, color: "#64d26d", fontWeight: 600, marginBottom: 12, letterSpacing: 1 }}>
             <div className="pd" style={{ width: 6, height: 6 }} />LIVE · AI 시장 분석
           </div>
-          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>AI가 지금 이 순간도 시장을 보고 있습니다 <span style={{ fontSize: 11, color: "#4a4a5e", fontWeight: 500 }}>(2026.03.05 15:28 업데이트)</span></h2>
+          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>AI가 지금 이 순간도 시장을 보고 있습니다 {signalUpdated && <span style={{ fontSize: 11, color: "#4a4a5e", fontWeight: 500 }}>({signalUpdated} 업데이트)</span>}</h2>
         </div>
         <div className="g2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, maxWidth: 900, margin: "0 auto" }}>
           <div className="gc" style={{ padding: 28 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-              <span style={{ fontSize: 28 }}>{re[AI_LIVE.regime]}</span>
+              <span style={{ fontSize: 28 }}>{re[aiLive.regime]}</span>
               <div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: rc[AI_LIVE.regime] }}>{AI_LIVE.regimeKr}</div>
-                <div style={{ fontSize: 12, color: "#6b6b7e" }}>종합 점수: {AI_LIVE.score.toFixed(2)}</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: rc[aiLive.regime] }}>{aiLive.regimeKr}</div>
+                <div style={{ fontSize: 12, color: "#6b6b7e" }}>종합 점수: {aiLive.score.toFixed(2)}</div>
               </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div style={{ padding: 14, borderRadius: 10, background: "rgba(255,255,255,0.02)" }}>
                 <div style={{ fontSize: 10, color: "#6b6b7e", marginBottom: 4 }}>Fear & Greed</div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: "#f0b90b" }}>{AI_LIVE.fearGreed}</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "#f0b90b" }}>{aiLive.fearGreed}</div>
                 <div style={{ fontSize: 10, color: "#6b6b7e" }}>공포</div>
               </div>
               <div style={{ padding: 14, borderRadius: 10, background: "rgba(255,255,255,0.02)" }}>
                 <div style={{ fontSize: 10, color: "#6b6b7e", marginBottom: 4 }}>VIX 공포지수</div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: "#f0b90b" }}>{AI_LIVE.vix}</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "#f0b90b" }}>{aiLive.vix}</div>
                 <div style={{ fontSize: 10, color: "#6b6b7e" }}>경계</div>
               </div>
             </div>
             <div style={{ marginTop: 16, padding: 12, borderRadius: 8, background: "rgba(255,107,53,0.04)", border: "1px solid rgba(255,107,53,0.1)", fontSize: 12, color: "#FF6B35", fontWeight: 600, textAlign: "center" }}>
-              💡 AI 권장: 현재 비중 유지 (HOLD)
+              💡 AI 권장: {aiLive.action === "hold" ? "현재 비중 유지 (HOLD)" : aiLive.action === "increase_risk" ? "성장 비중 확대 (공격)" : "안전자산 확대 (방어)"}
             </div>
           </div>
           <div className="gc" style={{ padding: 28 }}>
             <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 18 }}>4개 AI 분석 엔진</div>
-            {AI_LIVE.signals.map((s, i) => (
+            {aiLive.signals.map((s, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
                 <span style={{ fontSize: 20 }}>{s.icon}</span>
                 <div style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{s.name}</div>
