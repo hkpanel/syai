@@ -1,6 +1,6 @@
 /**
- * SY.ai 메인 페이지 v6
- * "현란 + 전문 + 쉬움"
+ * SY.ai 메인 페이지 v7
+ * 다운로드형 AI 분석 도구 + 서비스탭(Stock/Crypto/Soccer) + 법적 안전 문구
  */
 "use client";
 
@@ -50,6 +50,12 @@ const ETF_SEL = [
   { cat: "섹터", name: "TIGER 반도체TOP10", cap: "7.2조", score: 0.863, color: "#b47aff" },
 ];
 
+const SERVICES = [
+  { id: "deepstock", name: "DeepStock", icon: "📈", status: "BETA", color: "#FF6B35", desc: "국내 ETF AI 자동 분석 · 리밸런싱 제안", detail: "1,072개 국내 ETF를 AI가 실시간 스캔하고, 시장 분석 기반으로 최적 포트폴리오를 제안합니다. 한국투자증권 API 연동.", features: ["AI 시장분석", "ETF 자동선정", "리밸런싱 제안", "백테스트"], gradient: "linear-gradient(135deg,#FF6B35,#FF2E63)" },
+  { id: "deepcrypto", name: "DeepCrypto", icon: "₿", status: "준비중", color: "#f0b90b", desc: "암호화폐 AI 분석 & 매매 시그널", detail: "비트코인, 이더리움 등 주요 코인을 AI가 분석하여 매매 시그널을 제공합니다. 업비트·바이낸스 연동.", features: ["AI 차트분석", "매매 시그널", "변동성 알림", "차익거래"], gradient: "linear-gradient(135deg,#f0b90b,#f5d442)" },
+  { id: "deepsoccer", name: "DeepSoccer", icon: "⚽", status: "준비중", color: "#4a90d9", desc: "축구 AI 예측 분석", detail: "전세계 주요 리그 경기를 AI가 분석하여 데이터 기반 예측을 제공합니다.", features: ["BTTS 예측", "배당률 분석", "앙상블 AI", "실시간 업데이트"], gradient: "linear-gradient(135deg,#4a90d9,#357abd)" },
+];
+
 const PROFILES = [
   { name: "안정형", icon: "🛡️", target: "연 8~12%", mdd: "MDD -15%", desc: "월배당 + 안전자산 중심", tags: ["커버드콜 월배당", "채권", "저변동성"], color: "#4a90d9", hl: false },
   { name: "균형형", icon: "⚖️", target: "연 15~25%", mdd: "MDD -25%", desc: "성장 + 배당 혼합 (가장 인기)", tags: ["S&P500", "나스닥", "균형"], color: "#FF6B35", hl: true },
@@ -67,6 +73,7 @@ export default function HomePage() {
   const [vis, setVis] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [showAuth, setShowAuth] = useState(false);
+  const [activeTab, setActiveTab] = useState("deepstock");
   useEffect(() => { setVis(true); }, []);
   useEffect(() => { const u = onAuthChange(setUser); return () => u(); }, []);
 
@@ -120,28 +127,81 @@ export default function HomePage() {
         <div style={{ position: "relative", zIndex: 1, maxWidth: 900, margin: "0 auto", padding: "0 24px", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(30px)", transition: "all 1s ease" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 20, background: "rgba(100,210,109,0.08)", border: "1px solid rgba(100,210,109,0.2)", marginBottom: 24 }}>
             <div className="pd" />
-            <span style={{ fontSize: 12, color: "#64d26d", fontWeight: 600 }}>AI 엔진 가동중 · 1,072개 ETF 실시간 모니터링</span>
+            <span style={{ fontSize: 12, color: "#64d26d", fontWeight: 600 }}>AI 엔진 가동중 · 주식 · 코인 · 스포츠 AI 분석</span>
           </div>
           <h1 className="ht" style={{ fontSize: "clamp(28px,5vw,52px)", fontWeight: 800, lineHeight: 1.15, letterSpacing: "-1px", marginBottom: 20 }}>
-            <span>ETF를 직접 고르실</span><br />
-            <span style={{ background: "linear-gradient(135deg,#FF6B35,#FF2E63)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>필요가 없습니다</span>
+            <span>AI가 분석하고,</span><br />
+            <span style={{ background: "linear-gradient(135deg,#FF6B35,#FF2E63)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>당신이 결정합니다</span>
           </h1>
           <p className="hs" style={{ fontSize: "clamp(14px,1.8vw,18px)", color: "#8b8b9e", lineHeight: 1.8, maxWidth: 620, margin: "0 auto 36px" }}>
-            1,072개 국내 상장 ETF를 AI가 자동으로 스캔하고,<br />
-            시장 상황에 맞춰 최적의 포트폴리오를 구성합니다.<br />
-            <strong style={{ color: "#e8e8ed" }}>위험도만 선택하면, 나머지는 AI가 합니다.</strong>
+            1,072개 국내 ETF · 암호화폐 · 스포츠 데이터를 AI가 24시간 분석하고,<br />
+            최적의 전략을 제안합니다. <strong style={{ color: "#e8e8ed" }}>최종 실행은 항상 본인이 직접.</strong><br />
+            내 PC에서 돌아가는 AI 분석 도구 — 다운로드 한 번이면 끝.
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap", marginBottom: 48 }}>
-            <Link href="/deepstock" style={{ padding: "14px 36px", borderRadius: 12, textDecoration: "none", background: "linear-gradient(135deg,#FF6B35,#FF2E63)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 32px rgba(255,107,53,0.3)" }}>무료로 시작하기</Link>
+            <a href="#download" style={{ padding: "14px 36px", borderRadius: 12, textDecoration: "none", background: "linear-gradient(135deg,#FF6B35,#FF2E63)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 32px rgba(255,107,53,0.3)" }}>프로그램 다운로드</a>
             <a href="#backtest" style={{ padding: "14px 36px", borderRadius: 12, textDecoration: "none", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "#e8e8ed", fontWeight: 600, fontSize: 15 }}>수익률 확인 ↓</a>
           </div>
           <div className="sr" style={{ display: "flex", justifyContent: "center", gap: 48 }}>
-            {[{ n: 1072, s: "개", l: "ETF 실시간 스캔" }, { n: 4, s: "개", l: "AI 분석 엔진" }, { n: 7, s: "개", l: "자산 카테고리" }, { n: 24, s: "h", l: "무중단 운용" }].map((s, i) => (
+            {[{ n: 1072, s: "개", l: "ETF 실시간 스캔" }, { n: 4, s: "개", l: "AI 분석 엔진" }, { n: 3, s: "종", l: "서비스 (주식·코인·스포츠)" }, { n: 24, s: "h", l: "무중단 분석" }].map((s, i) => (
               <div key={i} style={{ textAlign: "center" }}>
                 <div style={{ fontSize: "clamp(26px,3.5vw,38px)", fontWeight: 800, background: "linear-gradient(135deg,#FF6B35,#FF2E63)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}><AnimNum value={s.n} suffix={s.s} /></div>
                 <div style={{ fontSize: 12, color: "#6b6b7e", marginTop: 4 }}>{s.l}</div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="gl" />
+
+      {/* ═══ 3가지 서비스 ═══ */}
+      <section style={{ maxWidth: 1200, margin: "0 auto 56px", padding: "0 24px" }}>
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>하나의 프로그램, 세 가지 AI</h2>
+          <p style={{ fontSize: "clamp(12px,1.4vw,15px)", color: "#6b6b7e" }}>SY.ai 런처 하나로 필요한 서비스만 골라 쓰세요</p>
+        </div>
+        <div className="g3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, maxWidth: 1000, margin: "0 auto" }}>
+          {SERVICES.map((svc, i) => (
+            <div key={i} className="gc" style={{ padding: 28, cursor: "pointer", borderColor: activeTab === svc.id ? "rgba(255,107,53,0.3)" : undefined }} onClick={() => setActiveTab(svc.id)}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                <span style={{ fontSize: 28 }}>{svc.icon}</span>
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 800 }}>{svc.name}</div>
+                  <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: `${svc.color}20`, color: svc.color, fontWeight: 700 }}>{svc.status}</span>
+                </div>
+              </div>
+              <div style={{ fontSize: 13, color: "#8b8b9e", lineHeight: 1.7, marginBottom: 14 }}>{svc.detail}</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {svc.features.map(f => (
+                  <span key={f} style={{ fontSize: 10, padding: "3px 8px", borderRadius: 4, background: "rgba(255,255,255,0.04)", color: "#8b8b9e", fontWeight: 600 }}>{f}</span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="gl" />
+
+      {/* ═══ 다운로드 CTA ═══ */}
+      <section id="download" style={{ maxWidth: 1200, margin: "0 auto 56px", padding: "0 24px" }}>
+        <div className="gc" style={{ padding: "40px 32px", textAlign: "center", background: "linear-gradient(135deg,rgba(255,107,53,0.04),rgba(255,46,99,0.02))", borderColor: "rgba(255,107,53,0.15)" }}>
+          <div style={{ fontSize: 40, marginBottom: 16 }}>🤖</div>
+          <h2 style={{ fontSize: "clamp(20px,3vw,28px)", fontWeight: 800, marginBottom: 8 }}>SY.ai — AI 투자 분석 도구</h2>
+          <p style={{ fontSize: "clamp(12px,1.4vw,15px)", color: "#8b8b9e", lineHeight: 1.8, marginBottom: 24 }}>
+            내 PC에 설치하고, 내 API 키로, 내가 직접 실행합니다.<br />
+            AI가 분석하고 제안하지만 <strong style={{ color: "#e8e8ed" }}>최종 투자 결정은 항상 본인</strong>입니다.<br />
+            자동 업데이트 지원 · 가벼운 코어 + 플러그인 구조
+          </p>
+          <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
+            <a href="#" style={{ padding: "14px 32px", borderRadius: 12, textDecoration: "none", background: "linear-gradient(135deg,#FF6B35,#FF2E63)", color: "#fff", fontWeight: 700, fontSize: 14, boxShadow: "0 8px 32px rgba(255,107,53,0.3)" }}>Windows 다운로드 (준비중)</a>
+          </div>
+          <div style={{ marginTop: 16, display: "flex", justifyContent: "center", gap: 24, fontSize: 11, color: "#6b6b7e" }}>
+            <span>✅ 자동 업데이트</span>
+            <span>✅ 내 PC에서 실행</span>
+            <span>✅ API 키 본인 관리</span>
+            <span>✅ 종목 추천 없음</span>
           </div>
         </div>
       </section>
@@ -286,8 +346,8 @@ export default function HomePage() {
       {/* 프로파일 3개 */}
       <section style={{ maxWidth: 1200, margin: "0 auto 56px", padding: "0 24px" }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>하나만 고르세요. 나머지는 AI가.</h2>
-          <p style={{ fontSize: "clamp(12px,1.4vw,15px)", color: "#6b6b7e" }}>투자 성향에 따라 3가지 중 선택하면 AI가 자동 운용</p>
+          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>하나만 고르세요. 나머지는 AI가 분석합니다.</h2>
+          <p style={{ fontSize: "clamp(12px,1.4vw,15px)", color: "#6b6b7e" }}>투자 성향에 따라 3가지 중 선택하면 AI가 최적 비중을 제안합니다</p>
         </div>
         <div className="g3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, maxWidth: 1000, margin: "0 auto" }}>
           {PROFILES.map((p, i) => (
@@ -319,14 +379,15 @@ export default function HomePage() {
       </section>
 
       <section style={{ textAlign: "center", padding: "48px 24px 64px" }}>
-        <h2 style={{ fontSize: "clamp(22px,3.5vw,36px)", fontWeight: 800, marginBottom: 12 }}>지금 시작하세요</h2>
-        <p style={{ fontSize: "clamp(13px,1.5vw,16px)", color: "#6b6b7e", marginBottom: 28 }}>소셜 로그인 30초 → 프로파일 선택 → AI가 24시간 운용</p>
-        <Link href="/deepstock" style={{ display: "inline-block", padding: "15px 44px", borderRadius: 14, textDecoration: "none", background: "linear-gradient(135deg,#FF6B35,#FF2E63)", color: "#fff", fontWeight: 700, fontSize: 16, boxShadow: "0 8px 40px rgba(255,107,53,0.3)" }}>무료로 시작하기 →</Link>
+        <h2 style={{ fontSize: "clamp(22px,3.5vw,36px)", fontWeight: 800, marginBottom: 12 }}>AI가 분석하고, 당신이 결정합니다</h2>
+        <p style={{ fontSize: "clamp(13px,1.5vw,16px)", color: "#6b6b7e", marginBottom: 28 }}>다운로드 → API 키 입력 → 프로파일 선택 → AI가 24시간 분석</p>
+        <a href="#download" style={{ display: "inline-block", padding: "15px 44px", borderRadius: 14, textDecoration: "none", background: "linear-gradient(135deg,#FF6B35,#FF2E63)", color: "#fff", fontWeight: 700, fontSize: 16, boxShadow: "0 8px 40px rgba(255,107,53,0.3)" }}>프로그램 다운로드</a>
       </section>
 
       <footer style={{ borderTop: "1px solid rgba(255,255,255,0.04)", padding: "22px 16px", textAlign: "center" }}>
         <div style={{ fontSize: 11, color: "#4a4a5e", lineHeight: 1.8 }}>
-          SY.ai는 투자 자문 서비스가 아닙니다. 모든 투자 판단은 본인 책임 하에 이루어져야 합니다.<br />
+          SY.ai는 AI 기반 투자 분석 소프트웨어이며, 투자자문업·투자일임업에 해당하지 않습니다.<br />
+          본 소프트웨어는 종목 추천이나 개별 투자 조언을 제공하지 않으며, 모든 투자 판단과 실행은 이용자 본인의 책임입니다.<br />
           과거 시뮬레이션 수익률은 미래 수익을 보장하지 않습니다.<br />
           © 2026 SY.ai · SY한국판넬 · SY Coin Project
         </div>
