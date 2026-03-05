@@ -6,6 +6,9 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { onAuthChange, signOut } from "@/lib/auth";
+import type { User } from "firebase/auth";
+import AuthModal from "@/app/components/AuthModal";
 
 type ServiceId = "deepstock" | "deepcrypto" | "deepsoccer";
 
@@ -54,7 +57,10 @@ export default function HomePage() {
   const [vis, setVis] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<ServiceId>("deepstock");
+  const [user, setUser] = useState<User | null>(null);
+  const [showAuth, setShowAuth] = useState(false);
   useEffect(() => { setVis(true); }, []);
+  useEffect(() => { const unsub = onAuthChange(setUser); return () => unsub(); }, []);
 
   const tabs: { id: ServiceId; label: string; live: boolean }[] = [
     { id: "deepstock", label: "📈 DeepStock", live: true },
@@ -124,6 +130,14 @@ export default function HomePage() {
             <span style={{ fontSize: 10, color: "#6b6b7e", border: "1px solid rgba(255,255,255,0.08)", padding: "2px 6px", borderRadius: 4 }}>BETA</span>
           </Link>
           <Link href="/deepstock" style={{ padding: "7px 14px", borderRadius: 8, textDecoration: "none", color: "#FF6B35", background: "rgba(255,107,53,0.08)", fontSize: 13, fontWeight: 600 }}>📈 시작하기</Link>
+          {user ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 13, color: "#e8e8ed", fontWeight: 500 }}>{user.displayName || "회원"}</span>
+              <button onClick={() => signOut()} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "none", color: "#6b6b7e", fontSize: 12, cursor: "pointer" }}>로그아웃</button>
+            </div>
+          ) : (
+            <button onClick={() => setShowAuth(true)} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(255,107,53,0.3)", background: "rgba(255,107,53,0.08)", color: "#FF6B35", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>로그인</button>
+          )}
         </div>
       </nav>
 
@@ -351,6 +365,8 @@ export default function HomePage() {
           © 2026 SY.ai · SY한국판넬 · SY Coin Project
         </div>
       </footer>
+
+      {showAuth && <AuthModal onClose={() => setShowAuth(false)} onLogin={() => setShowAuth(false)} />}
     </div>
   );
 }

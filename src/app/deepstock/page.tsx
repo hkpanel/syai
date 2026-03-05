@@ -8,6 +8,9 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { onAuthChange, signOut } from "@/lib/auth";
+import type { User } from "firebase/auth";
+import AuthModal from "@/app/components/AuthModal";
 
 /* ─── 카드 컴포넌트 ─── */
 function Card({ title, children, action, style: s }: {
@@ -48,6 +51,9 @@ export default function DeepStockPage() {
   const [kisRegistered, setKisRegistered] = useState(false);
   const [strategyRunning, setStrategyRunning] = useState(false);
   const [tab, setTab] = useState<"overview" | "strategy" | "fee" | "history">("overview");
+  const [user, setUser] = useState<User | null>(null);
+  const [showAuth, setShowAuth] = useState(false);
+  useEffect(() => { const unsub = onAuthChange(setUser); return () => unsub(); }, []);
 
   return (
     <div style={{ minHeight: "100vh", background: "#0c0808", color: "#e8e8ed" }}>
@@ -96,6 +102,14 @@ export default function DeepStockPage() {
             }}>
               <span style={{ fontSize: 13, fontWeight: 600, color: "#FF6B35" }}>충전금 ₩0</span>
             </div>
+            {user ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 13, color: "#e8e8ed", fontWeight: 500 }}>{user.displayName || "회원"}</span>
+                <button onClick={() => signOut()} style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "none", color: "#6b6b7e", fontSize: 12, cursor: "pointer" }}>로그아웃</button>
+              </div>
+            ) : (
+              <button onClick={() => setShowAuth(true)} style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "linear-gradient(135deg, #FF6B35, #FF2E63)", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>로그인</button>
+            )}
           </div>
         </div>
       </nav>
@@ -113,6 +127,7 @@ export default function DeepStockPage() {
               <button className="ds-btn ds-btn-red" onClick={() => setStrategyRunning(false)}>⏸ 전략 일시정지</button>
             ) : (
               <button className="ds-btn ds-btn-green" onClick={() => {
+                if (!user) { setShowAuth(true); return; }
                 if (!kisRegistered) { alert("먼저 한국투자증권 API키를 등록해주세요."); return; }
                 setStrategyRunning(true);
               }}>▶ 전략 시작</button>
@@ -276,8 +291,8 @@ export default function DeepStockPage() {
                 ))}
               </div>
               <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
-                <button className="ds-btn ds-btn-outline" style={{ flex: 1 }} onClick={() => setKisRegistered(true)}>모의투자 모드</button>
-                <button className="ds-btn ds-btn-green" style={{ flex: 1 }} onClick={() => setKisRegistered(true)}>API키 저장</button>
+                <button className="ds-btn ds-btn-outline" style={{ flex: 1 }} onClick={() => { if (!user) { setShowAuth(true); return; } setKisRegistered(true); }}>모의투자 모드</button>
+                <button className="ds-btn ds-btn-green" style={{ flex: 1 }} onClick={() => { if (!user) { setShowAuth(true); return; } setKisRegistered(true); }}>API키 저장</button>
               </div>
               <div style={{ marginTop: 16, padding: "12px 16px", borderRadius: 8, background: "rgba(255,255,255,0.02)", fontSize: 12, color: "#6b6b7e", lineHeight: 1.7 }}>
                 아직 API키가 없으시다면? <a href="https://apiportal.koreainvestment.com" target="_blank" style={{ color: "#FF6B35" }}>KIS Developers 바로가기 →</a>
@@ -440,6 +455,8 @@ export default function DeepStockPage() {
           © 2026 SY.ai · SY한국판넬 · SY Coin Project
         </div>
       </footer>
+
+      {showAuth && <AuthModal onClose={() => setShowAuth(false)} onLogin={() => setShowAuth(false)} />}
     </div>
   );
 }
