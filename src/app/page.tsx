@@ -129,14 +129,19 @@ export default function HomePage() {
             <div className="pd" />
             <span style={{ fontSize: 12, color: "#64d26d", fontWeight: 600 }}>AI 엔진 가동중 · 주식 · 코인 · 스포츠 AI 분석</span>
           </div>
-          <h1 className="ht" style={{ fontSize: "clamp(28px,5vw,52px)", fontWeight: 800, lineHeight: 1.15, letterSpacing: "-1px", marginBottom: 20 }}>
-            <span>AI가 분석하고,</span><br />
-            <span style={{ background: "linear-gradient(135deg,#FF6B35,#FF2E63)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>당신이 결정합니다</span>
+          <div style={{ display: "inline-flex", flexWrap: "wrap", justifyContent: "center", gap: 8, marginBottom: 20 }}>
+            {["FinBERT", "LSTM", "강화학습", "앙상블", "상관관계 네트워크"].map(t => (
+              <span key={t} style={{ fontSize: 10, padding: "3px 10px", borderRadius: 20, background: "rgba(255,107,53,0.06)", border: "1px solid rgba(255,107,53,0.12)", color: "#FF6B35", fontWeight: 600 }}>{t}</span>
+            ))}
+          </div>
+          <h1 className="ht" style={{ fontSize: "clamp(28px,5vw,52px)", fontWeight: 800, lineHeight: 1.15, letterSpacing: "-1px", marginBottom: 16 }}>
+            <span style={{ background: "linear-gradient(135deg,#FF6B35,#FF2E63)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>읽고, 기억하고, 진화하는 AI</span>
           </h1>
-          <p className="hs" style={{ fontSize: "clamp(14px,1.8vw,18px)", color: "#8b8b9e", lineHeight: 1.8, maxWidth: 620, margin: "0 auto 36px" }}>
-            1,072개 국내 ETF · 암호화폐 · 스포츠 데이터를 AI가 24시간 분석하고,<br />
-            최적의 전략을 제안합니다. <strong style={{ color: "#e8e8ed" }}>최종 실행은 항상 본인이 직접.</strong><br />
-            내 PC에서 돌아가는 AI 분석 도구 — 다운로드 한 번이면 끝.
+          <p style={{ fontSize: "clamp(13px,1.5vw,16px)", color: "#8b8b9e", marginBottom: 20 }}>어려운 기술을 모르셔도 괜찮습니다.</p>
+          <p className="hs" style={{ fontSize: "clamp(14px,1.8vw,18px)", color: "#8b8b9e", lineHeight: 1.8, maxWidth: 660, margin: "0 auto 36px" }}>
+            4개의 독립 AI 엔진이 시장 온도 · 뉴스 감성 · 공포지수를 24시간 분석하고,<br />
+            <strong style={{ color: "#e8e8ed" }}>1,072+개 ETF</strong>를 실시간 스캔하여 당신의 투자 성향에 맞는<br />
+            최적의 포트폴리오를 제안합니다.
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap", marginBottom: 48 }}>
             <a href="#download" style={{ padding: "14px 36px", borderRadius: 12, textDecoration: "none", background: "linear-gradient(135deg,#FF6B35,#FF2E63)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 32px rgba(255,107,53,0.3)" }}>프로그램 다운로드</a>
@@ -379,7 +384,7 @@ export default function HomePage() {
       </section>
 
       <section style={{ textAlign: "center", padding: "48px 24px 64px" }}>
-        <h2 style={{ fontSize: "clamp(22px,3.5vw,36px)", fontWeight: 800, marginBottom: 12 }}>AI가 분석하고, 당신이 결정합니다</h2>
+        <h2 style={{ fontSize: "clamp(22px,3.5vw,36px)", fontWeight: 800, marginBottom: 12 }}>읽고, 기억하고, 진화하는 AI를 경험하세요</h2>
         <p style={{ fontSize: "clamp(13px,1.5vw,16px)", color: "#6b6b7e", marginBottom: 28 }}>다운로드 → API 키 입력 → 프로파일 선택 → AI가 24시간 분석</p>
         <a href="#download" style={{ display: "inline-block", padding: "15px 44px", borderRadius: 14, textDecoration: "none", background: "linear-gradient(135deg,#FF6B35,#FF2E63)", color: "#fff", fontWeight: 700, fontSize: 16, boxShadow: "0 8px 40px rgba(255,107,53,0.3)" }}>프로그램 다운로드</a>
       </section>
