@@ -345,9 +345,27 @@ export default function DeepStockPage() {
                 한국투자증권 KIS Developers에서 발급받은 AppKey와 AppSecret을 등록해주세요.<br />
                 API키는 암호화되어 안전하게 저장되며, 오직 매매 실행 시에만 사용됩니다.
               </p>
-              {kisMode && <div style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 8, background: "rgba(255,107,53,0.06)", border: "1px solid rgba(255,107,53,0.1)" }}>
-                <span style={{ fontSize: 13, color: "#FF6B35", fontWeight: 600 }}>✅ {kisMode === "mock" ? "모의투자 모드" : "실전 모드"} 설정됨</span>
-              </div>}
+
+              {/* 모드 선택 탭 */}
+              <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+                {([["mock", "모의투자"], ["real", "실전거래"]] as const).map(([id, label]) => {
+                  const active = (kisMode || "mock") === id;
+                  return (
+                    <button key={id} onClick={() => setKisMode(id as "real" | "mock")}
+                      style={{
+                        flex: 1, padding: "12px 0", borderRadius: 10, fontSize: 14, fontWeight: 700,
+                        cursor: "pointer", transition: "all 0.2s",
+                        border: active ? "2px solid #FF6B35" : "1px solid rgba(255,255,255,0.08)",
+                        background: active ? "rgba(255,107,53,0.08)" : "rgba(255,255,255,0.02)",
+                        color: active ? "#FF6B35" : "#6b6b7e",
+                      }}>
+                      {active ? "✅ " : ""}{label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* API키 입력 폼 */}
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {[
                   { label: "HTS ID", placeholder: "한투 HTS 로그인 ID", type: "text", key: "htsId" },
@@ -368,10 +386,14 @@ export default function DeepStockPage() {
                   </div>
                 ))}
               </div>
-              <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
-                <button className="ds-btn ds-btn-outline" style={{ flex: 1 }} disabled={kisSaving} onClick={() => saveKisConfig("mock")}>{kisSaving ? "저장 중..." : "모의투자 모드"}</button>
-                <button className="ds-btn ds-btn-green" style={{ flex: 1 }} disabled={kisSaving} onClick={() => saveKisConfig("real")}>{kisSaving ? "저장 중..." : "API키 저장"}</button>
-              </div>
+
+              {/* 저장 버튼 */}
+              <button className="ds-btn ds-btn-green" disabled={kisSaving}
+                style={{ width: "100%", marginTop: 20, padding: "14px 0" }}
+                onClick={() => saveKisConfig((kisMode || "mock") as "real" | "mock")}>
+                {kisSaving ? "저장 중..." : "저장"}
+              </button>
+
               <div style={{ marginTop: 16, padding: "12px 16px", borderRadius: 8, background: "rgba(255,255,255,0.02)", fontSize: 12, color: "#6b6b7e", lineHeight: 1.7 }}>
                 아직 API키가 없으시다면? <a href="https://apiportal.koreainvestment.com" target="_blank" style={{ color: "#FF6B35" }}>KIS Developers 바로가기 →</a>
               </div>
