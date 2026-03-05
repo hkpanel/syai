@@ -134,6 +134,8 @@ export default function DeepStockPage() {
           font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
         .ds-tab:hover { color: #e8e8ed; }
         .ds-tab.active { color: #FF6B35; border-bottom-color: #FF6B35; }
+        .ds-tab-bar { scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; }
+        .ds-tab-bar::-webkit-scrollbar { display: none; }
         .ds-btn { padding: 10px 20px; border: none; border-radius: 10px; font-size: 13px; font-weight: 600;
           cursor: pointer; transition: all 0.2s; }
         .ds-btn-green { background: linear-gradient(135deg, #FF6B35, #FF2E63); color: #fff; }
@@ -143,15 +145,12 @@ export default function DeepStockPage() {
           padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04); align-items: center; }
         .h-row:last-child { border-bottom: none; }
         .tip-wrap:hover .tip-box { display: block !important; }
-        .ds-hide-m { }
-        .ds-nav-name { }
         @media (max-width: 768px) {
           .h-row { grid-template-columns: 1.5fr 1fr 1fr; font-size: 12px; }
           .h-row .hm { display: none; }
           .desk-grid { grid-template-columns: 1fr !important; }
           .ds-tab { padding: 8px 12px !important; font-size: 12px !important; white-space: nowrap !important; }
-          .ds-hide-m { display: none !important; }
-          .ds-nav-name { max-width: 60px !important; font-size: 11px !important; }
+          .ds-nav-name { max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px !important; }
         }
       `}</style>
 
@@ -162,31 +161,31 @@ export default function DeepStockPage() {
         borderBottom: "1px solid rgba(255,255,255,0.06)",
       }}>
         <div style={{
-          maxWidth: 1280, margin: "0 auto", padding: "0 16px",
-          height: 56, display: "flex", alignItems: "center", justifyContent: "space-between",
+          maxWidth: 1280, margin: "0 auto", padding: "0 24px",
+          height: 64, display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
-          <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
+          <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{
-              fontSize: 20, fontWeight: 800, letterSpacing: "-0.5px",
+              fontSize: 22, fontWeight: 800, letterSpacing: "-0.5px",
               background: "linear-gradient(135deg, #FF6B35, #FF2E63)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
             }}>SY.ai</span>
           </Link>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div className="ds-hide-m" style={{
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{
               display: "flex", alignItems: "center", gap: 6,
-              padding: "5px 10px", borderRadius: 8,
+              padding: "6px 12px", borderRadius: 8,
               background: "rgba(255,107,53,0.08)", border: "1px solid rgba(255,107,53,0.15)",
             }}>
-              <span style={{ fontSize: 12, fontWeight: 600, color: "#FF6B35" }}>충전금 ₩0</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#FF6B35" }}>충전금 ₩0</span>
             </div>
             {user ? (
               <>
-                <span className="ds-nav-name" style={{ fontSize: 12, color: "#e8e8ed", fontWeight: 500, maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{(user.displayName || "회원").split("(")[0]}</span>
-                <button onClick={() => signOut()} style={{ padding: "5px 8px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "none", color: "#6b6b7e", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>로그아웃</button>
+                <span className="ds-nav-name" style={{ fontSize: 13, color: "#e8e8ed", fontWeight: 500 }}>{user.displayName || "회원"}</span>
+                <button onClick={() => signOut()} style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "none", color: "#6b6b7e", fontSize: 12, cursor: "pointer", whiteSpace: "nowrap" }}>로그아웃</button>
               </>
             ) : (
-              <button onClick={() => setShowAuth(true)} style={{ padding: "7px 12px", borderRadius: 8, border: "none", background: "linear-gradient(135deg, #FF6B35, #FF2E63)", color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>로그인</button>
+              <button onClick={() => setShowAuth(true)} style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "linear-gradient(135deg, #FF6B35, #FF2E63)", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>로그인</button>
             )}
           </div>
         </div>
@@ -214,7 +213,7 @@ export default function DeepStockPage() {
         </div>
 
         {/* 탭 */}
-        <div style={{ display: "flex", gap: 4, marginBottom: 28, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+        <div className="ds-tab-bar" style={{ display: "flex", gap: 4, marginBottom: 28, borderBottom: "1px solid rgba(255,255,255,0.06)", overflowX: "auto" }}>
           {(["overview", "strategy", "fee", "history"] as const).map((t) => (
             <button key={t} className={`ds-tab ${tab === t ? "active" : ""}`} onClick={() => setTab(t)}>
               {{ overview: "📊 대시보드", strategy: "🎯 전략 설정", fee: "💰 수수료", history: "📋 매매 이력" }[t]}

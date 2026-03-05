@@ -90,12 +90,11 @@ export default function HomePage() {
         .tab-bar::-webkit-scrollbar { display: none; }
         @keyframes heroGlow { 0%,100%{opacity:.6} 50%{opacity:1} }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
-        .hide-m { }
-        .nav-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         @media (max-width: 767px) {
-          .hide-m { display: none !important; }
-          .nav-name { max-width: 80px !important; font-size: 12px !important; }
+          .nav-beta { display: none !important; }
+          .nav-start { display: none !important; }
+          .nav-name { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px !important; }
           .hero-section { padding: 64px 16px 48px !important; }
           .hero-title { font-size: 26px !important; letter-spacing: -0.5px !important; line-height: 1.25 !important; }
           .hero-sub { font-size: 13px !important; }
@@ -131,14 +130,14 @@ export default function HomePage() {
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 16px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
             <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-0.5px", background: "linear-gradient(135deg, #FF6B35, #FF2E63)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>SY.ai</span>
-            <span className="hide-m" style={{ fontSize: 10, color: "#6b6b7e", border: "1px solid rgba(255,255,255,0.08)", padding: "2px 6px", borderRadius: 4 }}>BETA</span>
+            <span className="nav-beta" style={{ fontSize: 10, color: "#6b6b7e", border: "1px solid rgba(255,255,255,0.08)", padding: "2px 6px", borderRadius: 4 }}>BETA</span>
           </Link>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <Link href="/deepstock" className="hide-m" style={{ padding: "7px 14px", borderRadius: 8, textDecoration: "none", color: "#FF6B35", background: "rgba(255,107,53,0.08)", fontSize: 13, fontWeight: 600 }}>📈 시작하기</Link>
+            <Link href="/deepstock" className="nav-start" style={{ padding: "7px 14px", borderRadius: 8, textDecoration: "none", color: "#FF6B35", background: "rgba(255,107,53,0.08)", fontSize: 13, fontWeight: 600 }}>📈 시작하기</Link>
             {user ? (
               <>
-                <span className="nav-name" style={{ fontSize: 13, color: "#e8e8ed", fontWeight: 500 }}>{(user.displayName || "회원").split("(")[0]}</span>
-                <button onClick={() => signOut()} style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "none", color: "#6b6b7e", fontSize: 12, cursor: "pointer", whiteSpace: "nowrap" }}>로그아웃</button>
+                <span className="nav-name" style={{ fontSize: 13, color: "#e8e8ed", fontWeight: 500 }}>{user.displayName || "회원"}</span>
+                <button onClick={() => signOut()} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "none", color: "#6b6b7e", fontSize: 12, cursor: "pointer", whiteSpace: "nowrap" }}>로그아웃</button>
               </>
             ) : (
               <button onClick={() => setShowAuth(true)} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(255,107,53,0.3)", background: "rgba(255,107,53,0.08)", color: "#FF6B35", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>로그인</button>
