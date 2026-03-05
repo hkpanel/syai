@@ -382,7 +382,7 @@ export default function DeepStockPage() {
                   {/* API키 입력 폼 + 툴팁 */}
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     {[
-                      { label: "HTS ID", placeholder: "한투 HTS 로그인 ID", type: "text", key: "htsId",
+                      { label: "HTS ID", placeholder: "예: @2119738", type: "text", key: "htsId",
                         tip: "💻 PC: 한국투자증권 홈페이지 로그인 시 사용하는 아이디\n📱 모바일: 한국투자 앱 > 설정 > 내 정보에서 확인" },
                       { label: "AppKey", placeholder: "36자리 AppKey", type: "password", key: "appKey",
                         tip: "💻 PC: apiportal.koreainvestment.com > 로그인 > API신청 > 발급받은 AppKey 복사\n📱 모바일: 한국투자 앱 > 트레이딩 > Open API > KIS Developers에서 확인" },
