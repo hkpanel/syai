@@ -181,7 +181,7 @@ export default function HomePage() {
       </nav>
 
       {/* HERO */}
-      <section className="hero-wrap" style={{ position: "relative", paddingTop: "clamp(90px,12vh,150px)", paddingBottom: "clamp(40px,9vh,100px)", textAlign: "center", overflow: "hidden" }}>
+      <section className="hero-wrap" style={{ position: "relative", paddingTop: "clamp(90px,12vh,150px)", paddingBottom: "clamp(40px,12vh,130px)", textAlign: "center", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translate(-50%,-50%)", width: "clamp(300px,60vw,700px)", height: "clamp(300px,60vw,700px)", borderRadius: "50%", background: "radial-gradient(circle,rgba(255,107,53,0.08) 0%,transparent 70%)", pointerEvents: "none" }} />
         <div style={{ position: "relative", zIndex: 1, maxWidth: 900, margin: "0 auto", padding: "0 24px", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(30px)", transition: "all 1s ease" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 20, background: "rgba(100,210,109,0.08)", border: "1px solid rgba(100,210,109,0.2)", marginBottom: 18 }}>
