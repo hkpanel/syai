@@ -55,6 +55,78 @@ export default function DeepStockPage() {
   const [showAuth, setShowAuth] = useState(false);
   useEffect(() => { const unsub = onAuthChange(setUser); return () => unsub(); }, []);
 
+  // KIS API 키 폼
+  const [kisForm, setKisForm] = useState({ htsId: "", appKey: "", appSecret: "", accountNo: "" });
+  const [kisSaving, setKisSaving] = useState(false);
+  const [kisMode, setKisMode] = useState<"real" | "mock" | null>(null); // real=실전, mock=모의
+  const [kisLoaded, setKisLoaded] = useState(false);
+
+  // 전략 프로파일
+  const [selectedProfile, setSelectedProfile] = useState<string>("balanced");
+
+  // 로그인 시 Firestore에서 KIS 설정 불러오기
+  useEffect(() => {
+    if (!user) { setKisRegistered(false); setKisLoaded(false); setKisMode(null); return; }
+    (async () => {
+      try {
+        const { doc: fsDoc, getDoc } = await import("firebase/firestore");
+        const { db } = await import("@/lib/firebase");
+        const snap = await getDoc(fsDoc(db, "users", user.uid, "deepstock-config", "kis"));
+        if (snap.exists()) {
+          const d = snap.data();
+          setKisForm({ htsId: d.htsId || "", appKey: d.appKey ? "••••••••" : "", appSecret: d.appSecret ? "••••••••" : "", accountNo: d.accountNo || "" });
+          setKisMode(d.mode || "real");
+          setKisRegistered(true);
+          setSelectedProfile(d.profile || "balanced");
+        }
+        setKisLoaded(true);
+      } catch (e) { console.error("KIS 설정 로드 실패:", e); setKisLoaded(true); }
+    })();
+  }, [user]);
+
+  // KIS API 키 저장
+  const saveKisConfig = async (mode: "real" | "mock") => {
+    if (!user) { setShowAuth(true); return; }
+    if (mode === "real" && (!kisForm.appKey || kisForm.appKey === "••••••••" && !kisForm.htsId)) {
+      alert("AppKey와 AppSecret을 입력해주세요."); return;
+    }
+    setKisSaving(true);
+    try {
+      const { doc: fsDoc, setDoc, serverTimestamp } = await import("firebase/firestore");
+      const { db } = await import("@/lib/firebase");
+      const data: Record<string, unknown> = {
+        mode,
+        profile: selectedProfile,
+        updatedAt: serverTimestamp(),
+      };
+      if (mode === "real") {
+        if (kisForm.htsId) data.htsId = kisForm.htsId;
+        if (kisForm.appKey && kisForm.appKey !== "••••••••") data.appKey = kisForm.appKey;
+        if (kisForm.appSecret && kisForm.appSecret !== "••••••••") data.appSecret = kisForm.appSecret;
+        if (kisForm.accountNo) data.accountNo = kisForm.accountNo;
+      }
+      await setDoc(fsDoc(db, "users", user.uid, "deepstock-config", "kis"), data, { merge: true });
+      setKisMode(mode);
+      setKisRegistered(true);
+      alert(mode === "mock" ? "모의투자 모드로 설정되었습니다!" : "API키가 저장되었습니다!");
+    } catch (e) {
+      console.error("KIS 저장 실패:", e);
+      alert("저장 실패: " + String(e));
+    }
+    setKisSaving(false);
+  };
+
+  // 프로파일 저장
+  const saveProfile = async (profile: string) => {
+    setSelectedProfile(profile);
+    if (!user) return;
+    try {
+      const { doc: fsDoc, setDoc, serverTimestamp } = await import("firebase/firestore");
+      const { db } = await import("@/lib/firebase");
+      await setDoc(fsDoc(db, "users", user.uid, "deepstock-config", "kis"), { profile, updatedAt: serverTimestamp() }, { merge: true });
+    } catch (e) { console.error("프로파일 저장 실패:", e); }
+  };
+
   return (
     <div style={{ minHeight: "100vh", background: "#0c0808", color: "#e8e8ed" }}>
       <style>{`
@@ -273,26 +345,32 @@ export default function DeepStockPage() {
                 한국투자증권 KIS Developers에서 발급받은 AppKey와 AppSecret을 등록해주세요.<br />
                 API키는 암호화되어 안전하게 저장되며, 오직 매매 실행 시에만 사용됩니다.
               </p>
+              {kisMode && <div style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 8, background: "rgba(255,107,53,0.06)", border: "1px solid rgba(255,107,53,0.1)" }}>
+                <span style={{ fontSize: 13, color: "#FF6B35", fontWeight: 600 }}>✅ {kisMode === "mock" ? "모의투자 모드" : "실전 모드"} 설정됨</span>
+              </div>}
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {[
-                  { label: "HTS ID", placeholder: "한투 HTS 로그인 ID", type: "text" },
-                  { label: "AppKey", placeholder: "36자리 AppKey", type: "password" },
-                  { label: "AppSecret", placeholder: "180자리 AppSecret", type: "password" },
-                  { label: "계좌번호", placeholder: "00000000-01", type: "text" },
+                  { label: "HTS ID", placeholder: "한투 HTS 로그인 ID", type: "text", key: "htsId" },
+                  { label: "AppKey", placeholder: "36자리 AppKey", type: "password", key: "appKey" },
+                  { label: "AppSecret", placeholder: "180자리 AppSecret", type: "password", key: "appSecret" },
+                  { label: "계좌번호", placeholder: "00000000-01", type: "text", key: "accountNo" },
                 ].map((f) => (
                   <div key={f.label}>
                     <label style={{ fontSize: 12, color: "#6b6b7e", display: "block", marginBottom: 4 }}>{f.label}</label>
-                    <input type={f.type} placeholder={f.placeholder} style={{
-                      width: "100%", padding: "12px 16px", borderRadius: 10,
-                      border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)",
-                      color: "#e8e8ed", fontSize: 14, outline: "none", boxSizing: "border-box" as const,
-                    }} />
+                    <input type={f.type} placeholder={f.placeholder}
+                      value={kisForm[f.key as keyof typeof kisForm]}
+                      onChange={(e) => setKisForm(prev => ({ ...prev, [f.key]: e.target.value }))}
+                      style={{
+                        width: "100%", padding: "12px 16px", borderRadius: 10,
+                        border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)",
+                        color: "#e8e8ed", fontSize: 14, outline: "none", boxSizing: "border-box" as const,
+                      }} />
                   </div>
                 ))}
               </div>
               <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
-                <button className="ds-btn ds-btn-outline" style={{ flex: 1 }} onClick={() => { if (!user) { setShowAuth(true); return; } setKisRegistered(true); }}>모의투자 모드</button>
-                <button className="ds-btn ds-btn-green" style={{ flex: 1 }} onClick={() => { if (!user) { setShowAuth(true); return; } setKisRegistered(true); }}>API키 저장</button>
+                <button className="ds-btn ds-btn-outline" style={{ flex: 1 }} disabled={kisSaving} onClick={() => saveKisConfig("mock")}>{kisSaving ? "저장 중..." : "모의투자 모드"}</button>
+                <button className="ds-btn ds-btn-green" style={{ flex: 1 }} disabled={kisSaving} onClick={() => saveKisConfig("real")}>{kisSaving ? "저장 중..." : "API키 저장"}</button>
               </div>
               <div style={{ marginTop: 16, padding: "12px 16px", borderRadius: 8, background: "rgba(255,255,255,0.02)", fontSize: 12, color: "#6b6b7e", lineHeight: 1.7 }}>
                 아직 API키가 없으시다면? <a href="https://apiportal.koreainvestment.com" target="_blank" style={{ color: "#FF6B35" }}>KIS Developers 바로가기 →</a>
@@ -302,35 +380,41 @@ export default function DeepStockPage() {
             <Card title="전략 프로파일 선택">
               {[
                 {
+                  id: "conservative",
                   name: "안정형 (Conservative)",
-                  badge: null,
                   target: "연 8~12% 목표",
                   mdd: "MDD -15% 이내",
                   desc: "커버드콜 월배당 ETF 중심. 채권 포함으로 변동성을 낮추고 꾸준한 현금흐름을 추구합니다.",
                 },
                 {
+                  id: "balanced",
                   name: "균형형 (Balanced)",
-                  badge: "추천",
                   target: "연 15~25% 목표",
                   mdd: "MDD -25% 이내",
                   desc: "S&P500 성장성 + 배당 안정성 혼합. 가장 많은 투자자가 선택하는 균형 잡힌 전략입니다.",
                 },
                 {
+                  id: "aggressive",
                   name: "공격형 (Aggressive)",
-                  badge: null,
                   target: "연 25%+ 목표",
                   mdd: "MDD -35% 각오",
                   desc: "나스닥·테크 섹터 집중. 변동성을 감수하고 장기 최대 수익을 추구합니다.",
                 },
-              ].map((p, i) => (
-                <div key={i} style={{
-                  padding: 20, borderRadius: 12, marginBottom: 12,
-                  border: p.badge ? "2px solid rgba(255,107,53,0.2)" : "1px solid rgba(255,255,255,0.06)",
-                  background: p.badge ? "rgba(255,107,53,0.03)" : "rgba(255,255,255,0.01)",
+              ].map((p) => {
+                const selected = selectedProfile === p.id;
+                return (
+                <div key={p.id} onClick={() => saveProfile(p.id)} style={{
+                  padding: 20, borderRadius: 12, marginBottom: 12, cursor: "pointer",
+                  border: selected ? "2px solid rgba(255,107,53,0.4)" : "1px solid rgba(255,255,255,0.06)",
+                  background: selected ? "rgba(255,107,53,0.05)" : "rgba(255,255,255,0.01)",
+                  transition: "all 0.2s",
                 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                    {p.badge && (
-                      <span style={{ padding: "3px 8px", borderRadius: 4, fontSize: 11, fontWeight: 700, background: "rgba(255,107,53,0.12)", color: "#FF6B35" }}>{p.badge}</span>
+                    {selected && (
+                      <span style={{ padding: "3px 8px", borderRadius: 4, fontSize: 11, fontWeight: 700, background: "rgba(255,107,53,0.12)", color: "#FF6B35" }}>선택됨</span>
+                    )}
+                    {p.id === "balanced" && !selected && (
+                      <span style={{ padding: "3px 8px", borderRadius: 4, fontSize: 11, fontWeight: 700, background: "rgba(255,255,255,0.06)", color: "#6b6b7e" }}>추천</span>
                     )}
                     <span style={{ fontSize: 15, fontWeight: 700, color: "#e8e8ed" }}>{p.name}</span>
                   </div>
@@ -340,7 +424,8 @@ export default function DeepStockPage() {
                   </div>
                   <p style={{ fontSize: 13, color: "#6b6b7e", lineHeight: 1.7 }}>{p.desc}</p>
                 </div>
-              ))}
+                );
+              })}
               <p style={{ fontSize: 11, color: "#4a4a5e", lineHeight: 1.7, marginTop: 8 }}>
                 ※ 레버리지 ETF는 모든 프로파일에서 제외됩니다.<br />
                 ※ 과거 시뮬레이션 수익률은 미래 수익을 보장하지 않습니다.
