@@ -63,10 +63,10 @@ const PROFILES = [
 ];
 
 const AI_FEAT = [
-  { icon: "🌡️", title: "시장 온도 감지", desc: "VIX·금리·공포지수를 종합해 시장을 4가지 국면으로 분류합니다" },
-  { icon: "📰", title: "뉴스 감성 분석", desc: "매일 금융 뉴스를 AI가 읽고 시장 분위기를 점수화합니다" },
-  { icon: "🔗", title: "자산 간 이상 신호", desc: "주식·채권·금·달러 상관관계가 깨지면 위기를 먼저 감지합니다" },
-  { icon: "📡", title: "대안 데이터 분석", desc: "구글 트렌드·환율·금리 스프레드 등 비전통 지표를 추적합니다" },
+  { icon: "🌡️", title: "시장 온도 감지 (LSTM)", desc: "과거 패턴을 기억하는 딥러닝이 VIX·금리·공포지수를 종합해 시장을 4가지 국면으로 분류합니다" },
+  { icon: "📰", title: "뉴스 감성 분석 (FinBERT)", desc: "금융 특화 AI가 매일 뉴스를 읽고 시장 분위기를 점수화합니다. 가격에 반영되기 전에 먼저 감지합니다" },
+  { icon: "🔗", title: "자산 간 이상 신호 감지", desc: "주식·채권·금·달러 상관관계가 깨지면 위기를 먼저 감지하고 방어 포지션으로 전환합니다" },
+  { icon: "📡", title: "대안 데이터 + 강화학습", desc: "구글 트렌드·환율·금리 스프레드를 추적하며, 강화학습이 시행착오를 통해 스스로 전략을 진화시킵니다" },
 ];
 
 export default function HomePage() {
@@ -96,10 +96,14 @@ export default function HomePage() {
         .cl{stroke-dasharray:1000;stroke-dashoffset:1000;animation:dl 2s ease-out forwards}
         @keyframes dl{to{stroke-dashoffset:0}}
         @media(max-width:767px){
-          .ht{font-size:24px!important} .hs{font-size:13px!important}
+          .ht{font-size:24px!important} .hs{font-size:12px!important}
           .g2{grid-template-columns:1fr!important} .g3{grid-template-columns:1fr!important}
-          .g7{grid-template-columns:repeat(2,1fr)!important} .sr{flex-direction:column!important;gap:12px!important}
+          .g7{grid-template-columns:repeat(2,1fr)!important}
+          .sr{display:grid!important;grid-template-columns:1fr 1fr!important;gap:16px!important;max-width:300px!important;margin:0 auto!important}
           .cs{flex-direction:column!important}
+          .gc{padding:18px!important} .gl{margin:32px auto!important}
+          section{margin-bottom:36px!important}
+          .mob-sm{font-size:11px!important} .mob-md{font-size:13px!important}
         }
       `}</style>
 
@@ -122,14 +126,14 @@ export default function HomePage() {
       </nav>
 
       {/* HERO */}
-      <section style={{ position: "relative", paddingTop: 120, paddingBottom: 80, textAlign: "center", overflow: "hidden" }}>
+      <section style={{ position: "relative", paddingTop: 100, paddingBottom: 56, textAlign: "center", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translate(-50%,-50%)", width: "clamp(300px,60vw,700px)", height: "clamp(300px,60vw,700px)", borderRadius: "50%", background: "radial-gradient(circle,rgba(255,107,53,0.08) 0%,transparent 70%)", pointerEvents: "none" }} />
         <div style={{ position: "relative", zIndex: 1, maxWidth: 900, margin: "0 auto", padding: "0 24px", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(30px)", transition: "all 1s ease" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 20, background: "rgba(100,210,109,0.08)", border: "1px solid rgba(100,210,109,0.2)", marginBottom: 24 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 20, background: "rgba(100,210,109,0.08)", border: "1px solid rgba(100,210,109,0.2)", marginBottom: 14 }}>
             <div className="pd" />
             <span style={{ fontSize: 12, color: "#64d26d", fontWeight: 600 }}>AI 엔진 가동중 · 주식 · 코인 · 스포츠 AI 분석</span>
           </div>
-          <div style={{ display: "inline-flex", flexWrap: "wrap", justifyContent: "center", gap: 8, marginBottom: 20 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 6, marginBottom: 24 }}>
             {["FinBERT", "LSTM", "강화학습", "앙상블", "상관관계 네트워크"].map(t => (
               <span key={t} style={{ fontSize: 10, padding: "3px 10px", borderRadius: 20, background: "rgba(255,107,53,0.06)", border: "1px solid rgba(255,107,53,0.12)", color: "#FF6B35", fontWeight: 600 }}>{t}</span>
             ))}
@@ -137,7 +141,7 @@ export default function HomePage() {
           <h1 className="ht" style={{ fontSize: "clamp(28px,5vw,52px)", fontWeight: 800, lineHeight: 1.15, letterSpacing: "-1px", marginBottom: 16 }}>
             <span style={{ background: "linear-gradient(135deg,#FF6B35,#FF2E63)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>읽고, 기억하고, 진화하는 AI</span>
           </h1>
-          <p style={{ fontSize: "clamp(13px,1.5vw,16px)", color: "#8b8b9e", marginBottom: 20 }}>어려운 기술을 모르셔도 괜찮습니다.</p>
+          <p style={{ fontSize: "clamp(13px,1.5vw,16px)", color: "#f0b90b", fontWeight: 600, marginBottom: 20 }}>어려운 기술을 모르셔도 괜찮습니다.</p>
           <p className="hs" style={{ fontSize: "clamp(14px,1.8vw,18px)", color: "#8b8b9e", lineHeight: 1.8, maxWidth: 660, margin: "0 auto 36px" }}>
             4개의 독립 AI 엔진이 시장 온도 · 뉴스 감성 · 공포지수를 24시간 분석하고,<br />
             <strong style={{ color: "#e8e8ed" }}>1,072+개 ETF</strong>를 실시간 스캔하여 당신의 투자 성향에 맞는<br />
@@ -147,11 +151,11 @@ export default function HomePage() {
             <a href="#download" style={{ padding: "14px 36px", borderRadius: 12, textDecoration: "none", background: "linear-gradient(135deg,#FF6B35,#FF2E63)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 32px rgba(255,107,53,0.3)" }}>프로그램 다운로드</a>
             <a href="#backtest" style={{ padding: "14px 36px", borderRadius: 12, textDecoration: "none", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "#e8e8ed", fontWeight: 600, fontSize: 15 }}>수익률 확인 ↓</a>
           </div>
-          <div className="sr" style={{ display: "flex", justifyContent: "center", gap: 48 }}>
-            {[{ n: 1072, s: "개", l: "ETF 실시간 스캔" }, { n: 4, s: "개", l: "AI 분석 엔진" }, { n: 3, s: "종", l: "서비스 (주식·코인·스포츠)" }, { n: 24, s: "h", l: "무중단 분석" }].map((s, i) => (
+          <div className="sr" style={{ display: "flex", justifyContent: "center", gap: 36 }}>
+            {[{ n: 1072, s: "+", l: "ETF 실시간 스캔" }, { n: 4, s: "개", l: "AI 분석 엔진" }, { n: 3, s: "종", l: "주식·코인·스포츠" }, { n: 24, s: "h", l: "무중단 분석" }].map((s, i) => (
               <div key={i} style={{ textAlign: "center" }}>
-                <div style={{ fontSize: "clamp(26px,3.5vw,38px)", fontWeight: 800, background: "linear-gradient(135deg,#FF6B35,#FF2E63)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}><AnimNum value={s.n} suffix={s.s} /></div>
-                <div style={{ fontSize: 12, color: "#6b6b7e", marginTop: 4 }}>{s.l}</div>
+                <div style={{ fontSize: "clamp(24px,3vw,36px)", fontWeight: 800, background: "linear-gradient(135deg,#FF6B35,#FF2E63)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}><AnimNum value={s.n} suffix={s.s} /></div>
+                <div style={{ fontSize: 11, color: "#6b6b7e", marginTop: 2 }}>{s.l}</div>
               </div>
             ))}
           </div>
@@ -206,7 +210,6 @@ export default function HomePage() {
             <span>✅ 자동 업데이트</span>
             <span>✅ 내 PC에서 실행</span>
             <span>✅ API 키 본인 관리</span>
-            <span>✅ 종목 추천 없음</span>
           </div>
         </div>
       </section>
@@ -217,8 +220,8 @@ export default function HomePage() {
       <section style={{ maxWidth: 1200, margin: "0 auto 56px", padding: "0 24px" }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <div style={{ display: "inline-block", padding: "3px 11px", borderRadius: 20, background: "rgba(255,107,53,0.06)", border: "1px solid rgba(255,107,53,0.15)", fontSize: 11, color: "#FF6B35", fontWeight: 600, marginBottom: 12, letterSpacing: 1 }}>AI 자동 선정</div>
-          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>1,072개 중 AI가 고른 최적의 7종</h2>
-          <p style={{ fontSize: "clamp(12px,1.4vw,15px)", color: "#6b6b7e" }}>시가총액 · 거래량 · NAV 괴리율 종합 분석</p>
+          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>1,072+개 중 AI가 고른 최적의 7종</h2>
+          <p style={{ fontSize: "clamp(12px,1.4vw,15px)", color: "#6b6b7e" }}>시가총액 · 거래량 · NAV 괴리율 종합 분석 <span style={{ fontSize: 10, color: "#4a4a5e" }}>(2026.03.05 15:57 업데이트)</span></p>
         </div>
         <div className="g7" style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 10 }}>
           {ETF_SEL.map((e, i) => (
@@ -243,7 +246,7 @@ export default function HomePage() {
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "3px 11px", borderRadius: 20, background: "rgba(100,210,109,0.06)", border: "1px solid rgba(100,210,109,0.15)", fontSize: 11, color: "#64d26d", fontWeight: 600, marginBottom: 12, letterSpacing: 1 }}>
             <div className="pd" style={{ width: 6, height: 6 }} />LIVE · AI 시장 분석
           </div>
-          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>AI가 지금 이 순간도 시장을 보고 있습니다</h2>
+          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>AI가 지금 이 순간도 시장을 보고 있습니다 <span style={{ fontSize: 11, color: "#4a4a5e", fontWeight: 500 }}>(2026.03.05 15:28 업데이트)</span></h2>
         </div>
         <div className="g2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, maxWidth: 900, margin: "0 auto" }}>
           <div className="gc" style={{ padding: 28 }}>
@@ -332,8 +335,8 @@ export default function HomePage() {
       {/* AI 엔진 4개 */}
       <section style={{ maxWidth: 1200, margin: "0 auto 56px", padding: "0 24px" }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>단순 보조지표가 아닙니다</h2>
-          <p style={{ fontSize: "clamp(12px,1.4vw,15px)", color: "#6b6b7e" }}>4개 독립 AI 엔진이 앙상블로 시장을 종합 판단합니다</p>
+          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>이동평균선, MACD로 투자하던 시대는 끝났습니다</h2>
+          <p style={{ fontSize: "clamp(12px,1.4vw,15px)", color: "#6b6b7e" }}>FinBERT · LSTM · 강화학습 — 4개 독립 AI 엔진이 앙상블로 시장을 읽습니다</p>
         </div>
         <div className="g2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, maxWidth: 900, margin: "0 auto" }}>
           {AI_FEAT.map((f, i) => (
