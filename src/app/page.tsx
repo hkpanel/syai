@@ -140,7 +140,7 @@ export default function HomePage() {
         *{margin:0;padding:0;box-sizing:border-box}
         .gc{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;transition:all .4s cubic-bezier(.22,1,.36,1)}
         .gc:hover{border-color:rgba(255,107,53,0.2);transform:translateY(-4px)}
-        .gl{height:1px;background:linear-gradient(90deg,transparent,rgba(255,107,53,0.4),transparent);margin:clamp(16px,2.5vh,32px) auto;max-width:600px}
+        .gl{height:1px;background:linear-gradient(90deg,transparent,rgba(255,107,53,0.4),transparent);margin:clamp(12px,2vh,24px) auto;max-width:600px}
         .pd{width:8px;height:8px;border-radius:50%;background:#64d26d;animation:pd 2s infinite}
         @keyframes pd{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
         @keyframes su{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
@@ -181,7 +181,7 @@ export default function HomePage() {
       </nav>
 
       {/* HERO */}
-      <section className="hero-wrap" style={{ position: "relative", paddingTop: "clamp(100px,14vh,160px)", paddingBottom: "clamp(48px,8vh,80px)", textAlign: "center", overflow: "hidden" }}>
+      <section className="hero-wrap" style={{ position: "relative", paddingTop: "clamp(90px,12vh,150px)", paddingBottom: "clamp(40px,6vh,64px)", textAlign: "center", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translate(-50%,-50%)", width: "clamp(300px,60vw,700px)", height: "clamp(300px,60vw,700px)", borderRadius: "50%", background: "radial-gradient(circle,rgba(255,107,53,0.08) 0%,transparent 70%)", pointerEvents: "none" }} />
         <div style={{ position: "relative", zIndex: 1, maxWidth: 900, margin: "0 auto", padding: "0 24px", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(30px)", transition: "all 1s ease" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 20, background: "rgba(100,210,109,0.08)", border: "1px solid rgba(100,210,109,0.2)", marginBottom: 18 }}>
@@ -218,7 +218,7 @@ export default function HomePage() {
       <div className="gl" />
 
       {/* ═══ 3가지 서비스 ═══ */}
-      <section style={{ maxWidth: 1200, margin: "0 auto 56px", padding: "0 24px" }}>
+      <section style={{ maxWidth: 1200, margin: "0 auto 40px", padding: "0 24px" }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>하나의 프로그램, 세 가지 AI</h2>
           <p style={{ fontSize: "clamp(12px,1.4vw,15px)", color: "#6b6b7e" }}>SY.ai 런처 하나로 필요한 서비스만 골라 쓰세요</p>
