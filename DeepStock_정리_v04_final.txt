@@ -1,0 +1,303 @@
+SY.ai DeepStock 기획 정리 (DeepStock 04 방 최종)
+작성일: 2026-03-05
+=========================================================
+
+1. 서비스 개요
+=========================================================
+
+서비스명: SY.ai (syai.co.kr)
+하위 서비스:
+  - DeepStock: 국내 ETF AI 분석 + 리밸런싱 제안 (현재 개발중)
+  - DeepCrypto: 암호화폐 AI 분석 + 매매 시그널 (예정)
+  - DeepSoccer: 축구 AI 예측 분석 (예정, 토토봇 sb_pipeline.py 기반)
+
+핵심 변경 (이번 방에서):
+  - "AI 자동매매 서비스" → "AI 투자 분석 소프트웨어(도구)" 로 포지셔닝 변경
+  - 웹 기반 서비스 → "다운로드형 프로그램" 으로 배포방식 변경 (YSBot과 동일 구조)
+  - 이유: 한국 자본시장법상 투자일임업(자기자본 15억) 규제 회피
+  - 판례 근거: 인천지방법원 2017노1649, 대법원 2018도4413
+    → 자동매매 프로그램 판매 + 기본 설정값 제공 = 투자자문업 아님 (무죄)
+    → 다만 유사투자자문업 신고는 필요할 수 있음 (금융위 신고, 자본금 불필요)
+
+
+2. 배포 방식 (대격변)
+=========================================================
+
+기존 기획서: 웹 기반 (syai.co.kr에서 로그인 → 한투 API 등록 → 서버에서 자동매매)
+변경 후: 다운로드형 프로그램 (YSBot 방식)
+
+구조:
+  SY.ai 런처 (코어, 30~50MB 경량)
+    ├── 자동 업데이트 모듈 (YSBot의 수동 업데이트 문제 해결)
+    ├── 공통 API 연결 (한투, 업비트, 바이낸스 등)
+    ├── 로그인 + 라이선스 관리
+    └── 플러그인 (필요한 것만 추가/삭제)
+         ├── DeepStock (ETF 리밸런싱)
+         ├── DeepCrypto (코인) - 나중에
+         └── DeepSoccer (토토) - 나중에
+
+exe 배포: Python 엔진을 PyInstaller로 exe 변환
+자동 업데이트: 프로그램 시작 시 버전 체크 → 자동 패치 (YSBot 불편사항 해결)
+용량: 플러그인 방식이라 AllInOne 740MB 같은 거대 파일 방지
+
+법적 안전 포인트:
+  - 유저가 프로그램 다운로드 → 본인 PC에서 실행
+  - 유저가 본인 한투 API 키 직접 입력
+  - 유저가 프로파일(안정/균형/공격) 직접 선택
+  - AI는 "분석 + 제안"만, 최종 매매 실행은 유저 본인
+  - 종목 추천 없음 (카테고리 비중 제안만)
+  - 모든 유저에게 동일한 프로그램 제공 (개별성 없음)
+
+syai.co.kr 홈페이지 역할:
+  - 프로그램 다운로드 페이지
+  - 회원가입/로그인 (Firebase Auth, 구글/카카오 소셜로그인)
+  - 월 구독료 충전 (원화 무통장/카드 + SYC 코인)
+  - 서비스 소개, 백테스트 결과, AI 분석 현황 실시간 표시
+
+
+3. 수수료/충전 구조
+=========================================================
+
+과금 모델: 거래금액의 0.05% (기획서 v2.2 확정)
+
+충전 방식:
+  - 원화: 무통장입금 또는 카드결제 → 1:1 크레딧 (홈페이지에서 충전)
+  - SYC 코인: MetaMask 연동, PancakeSwap 시세 기준 → 20~30% 할인
+  - 홈페이지에서 충전 가능 (소프트웨어 이용료, 법적 문제없음)
+
+동생 YSBot 수수료 참고:
+  - 기본 0.04%, 누적충전에 따라 0.003%까지 감소
+  - 우리도 유사한 누적 할인 구조 검토 가능
+
+
+4. AI 엔진 상세
+=========================================================
+
+4-1. 현재 구현 완료된 것
+
+  config/settings.yaml - 전체 설정 (API키, 전략 파라미터, 프로파일 비중)
+  config/__init__.py - YAML 로더 + 환경변수 치환
+
+  core/logger.py - 콘솔+파일 동시 로깅
+  core/notifier.py - 텔레그램/콘솔 알림 (인터페이스 기반, 확장 가능)
+  core/firestore_sync.py - Firestore 실시간 동기화 (★ 이번 방에서 추가)
+    → save_live_signal(): AI 분석 결과 저장 → 홈페이지 실시간 반영
+    → save_etf_selection(): ETF 선정 결과 저장 → 홈페이지 실시간 반영
+    → firebase-admin 미설치 시 로컬 JSON 폴백
+
+  datasource/base.py - 데이터소스 추상 인터페이스 (Candle, Quote, AssetInfo)
+  datasource/kis.py - 한투 KIS API (토큰관리, 시세, 잔고, 주문, 일봉)
+  datasource/yahoo.py - Yahoo Finance (백테스트용 과거 데이터)
+
+  analyzer/base.py - 분석기 인터페이스 + 앙상블 클래스
+  analyzer/regime.py - 시장 온도 감지 (★ 다중 소스: alternative.me → CNN → yfinance → 한투API)
+  analyzer/sentiment.py - 뉴스 감성 분석 (★ 다중 소스: Google News RSS → Yahoo RSS → 한국 Google News)
+  analyzer/correlation.py - 자산 간 이상 신호 + 대안 데이터
+
+  strategy/__init__.py - 프로파일 관리 + 동적 비중 조절 + ETF 점수 산출 + 리밸런싱 계산
+  strategy/etf_selector.py - 네이버 금융 API로 ETF 1,072+개 전종목 자동 스캔/분류/선정
+    → 캐시 사용 시에도 Firestore 저장 (버그 수정 완료)
+
+  deepstock/__init__.py - DeepStock 메인 엔진
+    → 분석 완료 시 Firestore 자동 저장 (분석기 이름 한글 매핑 포함)
+
+  run.py - 메인 실행 (메뉴 선택 방식, 7가지 메뉴)
+  requirements.txt - 의존성 목록 (firebase-admin 포함)
+
+4-2. 현재 AI 수준 (솔직하게)
+
+  시장 온도: Fear&Greed + VIX 규칙 기반 → 딥러닝 아님
+  뉴스 감성: 키워드 매칭 (다중 소스 확보) → 딥러닝 아님
+  자산 상관: numpy 상관계수 → 딥러닝 아님
+  대안 데이터: 환율 변동 체크 → 딥러닝 아님
+
+  뼈대(인프라) + 데이터 파이프라인 + Firestore 연동은 완성
+  진짜 딥러닝은 다음 방에서 본격 구현
+
+4-3. 앞으로 넣을 딥러닝 (5종)
+
+  1) FinBERT (금융 특화 NLP)
+     - ProsusAI/finbert 모델
+     - 뉴스 헤드라인 → 긍정/부정/중립 분류
+     - analyzer/sentiment.py의 키워드 매칭을 교체
+
+  2) LSTM (시계열 딥러닝)
+     - 시장 레짐(강세/약세/위기/횡보) 패턴 학습
+     - analyzer/regime.py의 규칙 기반을 교체
+
+  3) 강화학습 (Reinforcement Learning)
+     - 시행착오로 최적 비중 배분 전략 학습
+
+  4) 앙상블 학습
+     - 토토봇 NN+XGB+LR처럼 여러 모델 조합
+     - analyzer/base.py의 AnalyzerEnsemble이 이 구조
+
+  5) Cross-Asset Correlation Network
+     - 주식/채권/금/달러/환율 관계를 신경망으로 추적
+
+
+5. Firestore 실시간 연동 (★ 이번 방에서 완성)
+=========================================================
+
+흐름:
+  Python 엔진 (분석 실행)
+    ↓ core/firestore_sync.py
+  Firestore (syai/live-signal, syai/etf-selection)
+    ↓ onSnapshot 실시간 구독
+  홈페이지 page.tsx → 유저 화면에 자동 반영 (업데이트 시간 포함)
+
+Firestore 문서 구조:
+  syai/live-signal:
+    score, regime, regimeKr, confidence, action, signals[], targetWeights{}, profile, updatedAt
+  syai/etf-selection:
+    totalScanned, selected[], updatedAt
+
+설정 필요:
+  1. Firebase 콘솔 → 서비스 계정 → 새 비공개 키 생성 → JSON 다운로드
+  2. syai-engine/config/firebase-service-account.json 으로 저장
+  3. pip install firebase-admin
+  4. Firestore 보안 규칙에 추가:
+     match /syai/{docId} {
+       allow read: if true;
+       allow write: if true;
+     }
+
+확인 완료: 분석 실행 → Firestore 저장 → 홈페이지 실시간 반영 (업데이트 시간 표시)
+
+
+6. ETF 자동 선정 엔진
+=========================================================
+
+데이터 소스: 네이버 금융 API (pykrx는 Python3.13+pandas 호환 문제로 폐기)
+URL: https://finance.naver.com/api/sise/etfItemList.nhn
+응답: 1,072+개 ETF (시총, 거래량, NAV, 등락률 포함)
+
+카테고리 자동 분류 (ETF 이름 키워드 매칭):
+  sp500, nasdaq, covered_call, bond, gold, korea, sector
+  레버리지/인버스/선물/옵션은 자동 제외
+
+점수 산출: 시가총액 40% + 거래량 30% + NAV 괴리율 30%
+
+캐시: data/etf_cache.json (하루 1회, 캐시에서도 Firestore 저장)
+
+
+7. 한투 KIS API 연동
+=========================================================
+
+상태: 연결 성공 확인 완료
+환경변수 (Vercel + 로컬 둘 다 설정):
+  KIS_APP_KEY, KIS_APP_SECRET, KIS_HTS_ID, KIS_ACCOUNT_NO
+
+Next.js API 라우트: /api/kis/test, /api/kis/price, /api/kis/balance, /api/kis/order, /api/kis/candles
+Python 엔진: datasource/kis.py (동일 기능, aiohttp 비동기)
+
+
+8. 프로젝트 파일 구조
+=========================================================
+
+8-1. syai 웹 (Next.js)
+  경로: G:\내 드라이브\syai\
+  GitHub: hkpanel/syai → Vercel: syai → 도메인: syai.co.kr
+  테마 D: #FF6B35 / #FF2E63
+
+  주요 파일:
+    src/app/page.tsx - 메인페이지 v7 (Firestore 실시간 연동)
+    src/lib/kis-api.ts - 한투 API 모듈
+    src/lib/firebase.ts - Firebase 클라이언트 (db export)
+    src/app/api/kis/* - 한투 API 라우트 5개
+
+  git push: cd /d "G:\내 드라이브\syai" && git add -A && git commit -m "메시지" && git push origin main
+
+8-2. syai-engine 파이썬 엔진
+  경로: G:\내 드라이브\syai-engine\
+  GitHub: 아직 미등록
+
+  폴더 구조:
+    config/settings.yaml + __init__.py + firebase-service-account.json (비공개)
+    core/logger.py + notifier.py + firestore_sync.py + __init__.py
+    datasource/base.py + kis.py + yahoo.py + __init__.py
+    analyzer/base.py + regime.py + sentiment.py + correlation.py + __init__.py
+    strategy/__init__.py + etf_selector.py
+    deepstock/__init__.py
+    run.py + requirements.txt
+    data/ (캐시, 로컬 JSON 폴백)
+    logs/ (일별 로그)
+
+  실행: cd /d "G:\내 드라이브\syai-engine" && python run.py
+  파이썬: 3.13 (오빠 PC)
+  의존성: pyyaml aiohttp numpy yfinance matplotlib firebase-admin + deprecated multipledispatch
+
+
+9. 홈페이지 문구 현황
+=========================================================
+
+확정:
+  뱃지: [FinBERT] [LSTM] [강화학습] [앙상블] [상관관계 네트워크]
+  서브1: "어려운 기술을 모르셔도 괜찮습니다." (골드색 강조)
+  서브2: "4개의 독립 AI 엔진이 시장 온도 · 뉴스 감성 · 공포지수를 24시간 분석하고,
+         1,072+개 ETF를 실시간 스캔하여 당신의 투자 성향에 맞는
+         최적의 포트폴리오를 제안합니다."
+  서비스: DeepStock(BETA) / DeepCrypto(준비중) / DeepSoccer(준비중) 3탭
+  다운로드: "SY.ai — AI 투자 분석 도구" / Windows 다운로드 (준비중)
+  AI엔진 카드: 시장 온도(LSTM) / 뉴스 감성(FinBERT) / 자산 간 이상 신호 / 대안 데이터+강화학습
+  면책: "SY.ai는 AI 기반 투자 분석 소프트웨어이며, 투자자문업·투자일임업에 해당하지 않습니다."
+
+미확정:
+  히어로 타이틀: 현재 "읽고, 기억하고, 진화하는 AI" → 오빠가 더 좋은 문구 고민중
+
+
+10. 프로파일 (기획서 유지)
+=========================================================
+
+안정형: 연 8~12%, MDD -15%
+  covered_call 35%, sp500 20%, bond 20%, gold 10%, korea 10%, cash 5%
+
+균형형: 연 15~25%, MDD -25%
+  sp500 30%, nasdaq 20%, covered_call 20%, bond 10%, korea 10%, gold 5%, cash 5%
+
+공격형: 연 25%+, MDD -35%
+  nasdaq 35%, sp500 25%, sector 15%, korea 10%, covered_call 10%, cash 5%
+
+
+11. 다음 방에서 할 것
+=========================================================
+
+우선순위 높음:
+  [ ] 딥러닝 모델 구현 (FinBERT 감성분석 교체, LSTM 레짐 분류)
+  [ ] 시뮬레이션 모드 완성 (가상 잔고로 매매 시뮬레이션)
+  [ ] 백테스트 엔진 (Yahoo Finance 과거 데이터 기반 진짜 수익률 계산)
+  [ ] 리밸런싱 → 유저 승인 플로우 (Firestore 제안 저장 → 대시보드 확인 → 승인)
+
+우선순위 중간:
+  [ ] exe 배포 (PyInstaller)
+  [ ] 자동 업데이트 모듈
+  [ ] 텔레그램 알림 연동
+  [ ] 대시보드 페이지 (/deepstock) 실제 데이터 연동
+  [ ] 크레딧 충전 시스템 (홈페이지 원화/SYC)
+  [ ] Firestore 실시간 ETF/시그널을 1시간 자동 루프로 갱신 (엔진 메뉴 3번)
+
+우선순위 낮음:
+  [ ] 강화학습 (Phase 6)
+  [ ] DeepCrypto 개발 시작
+  [ ] DeepSoccer (토토봇 이관)
+  [ ] 유사투자자문업 금융위 신고
+  [ ] 금감원 1332 전화 확인
+
+
+12. 동생 YSBot (벤치마크)
+=========================================================
+
+URL: https://ysbot.co.kr
+대표: 김윤수 (YS Communications)
+방식: 다운로드형 (AllInOne Setup.msi, 740MB)
+지원: 업비트, 바이낸스, 바이비트, 한투
+수수료: 0.04% (누적충전 따라 감소)
+문제점: 수동 업데이트, 용량 과대 → 우리는 자동업데이트+플러그인으로 해결
+
+
+13. SYC 코인
+=========================================================
+
+컨트랙트: 0x6b2880CE191c790cA47329Dd761B07b71284785F (BSC, BEP-20)
+PancakeSwap 유동성 풀 구성 완료
+크레딧 충전 시 SYC 결제 → 20~30% 할인

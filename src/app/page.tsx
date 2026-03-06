@@ -6,12 +6,16 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { onAuthChange, signOut } from "@/lib/auth";
 import type { User } from "firebase/auth";
 import AuthModal from "@/app/components/AuthModal";
 
 import { db } from "@/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
+
+// 백테스트 차트 (recharts 사용, SSR 비활성)
+const BacktestChart = dynamic(() => import("@/app/components/BacktestChart"), { ssr: false });
 
 function AnimNum({ value, suffix = "" }: { value: number; suffix?: string }) {
   const [d, setD] = useState(0);
@@ -23,15 +27,6 @@ function AnimNum({ value, suffix = "" }: { value: number; suffix?: string }) {
   return <span>{d.toLocaleString()}{suffix}</span>;
 }
 
-const BACKTEST = [
-  { year: "2020", ds: 100, bank: 100, sp: 100 },
-  { year: "2021", ds: 128, bank: 102, sp: 127 },
-  { year: "2022", ds: 119, bank: 104, sp: 103 },
-  { year: "2023", ds: 152, bank: 107, sp: 129 },
-  { year: "2024", ds: 189, bank: 110, sp: 162 },
-  { year: "2025", ds: 215, bank: 113, sp: 179 },
-  { year: "2026", ds: 248, bank: 116, sp: 198 },
-];
 
 const DEFAULT_AI_LIVE = {
   regime: "sideways", regimeKr: "횡보장", score: -0.06, fearGreed: 42, vix: 22.4,
@@ -314,12 +309,16 @@ export default function HomePage() {
               <div style={{ padding: 14, borderRadius: 10, background: "rgba(255,255,255,0.02)" }}>
                 <div style={{ fontSize: 10, color: "#6b6b7e", marginBottom: 4 }}>Fear & Greed</div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: "#f0b90b" }}>{aiLive.fearGreed}</div>
-                <div style={{ fontSize: 10, color: "#6b6b7e" }}>공포</div>
+                <div style={{ fontSize: 10, color: "#6b6b7e" }}>
+                  {aiLive.fearGreed <= 25 ? "극도 공포" : aiLive.fearGreed <= 45 ? "공포" : aiLive.fearGreed <= 55 ? "중립" : aiLive.fearGreed <= 75 ? "탐욕" : "극도 탐욕"}
+                </div>
               </div>
               <div style={{ padding: 14, borderRadius: 10, background: "rgba(255,255,255,0.02)" }}>
                 <div style={{ fontSize: 10, color: "#6b6b7e", marginBottom: 4 }}>VIX 공포지수</div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: "#f0b90b" }}>{aiLive.vix}</div>
-                <div style={{ fontSize: 10, color: "#6b6b7e" }}>경계</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: aiLive.vix >= 30 ? "#FF2E63" : aiLive.vix >= 20 ? "#f0b90b" : "#64d26d" }}>{aiLive.vix}</div>
+                <div style={{ fontSize: 10, color: "#6b6b7e" }}>
+                  {aiLive.vix >= 35 ? "위기" : aiLive.vix >= 25 ? "경계" : aiLive.vix >= 18 ? "주의" : "안정"}
+                </div>
               </div>
             </div>
             <div style={{ marginTop: 16, padding: 12, borderRadius: 8, background: "rgba(255,107,53,0.04)", border: "1px solid rgba(255,107,53,0.1)", fontSize: 12, color: "#FF6B35", fontWeight: 600, textAlign: "center" }}>
@@ -344,43 +343,9 @@ export default function HomePage() {
 
       <div className="gl" />
 
-      {/* 백테스트 차트 */}
+      {/* 백테스트 차트 — Firestore 실시간 */}
       <section id="backtest" style={{ maxWidth: 1200, margin: "0 auto 56px", padding: "0 24px" }}>
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <div style={{ display: "inline-block", padding: "3px 11px", borderRadius: 20, background: "rgba(255,107,53,0.06)", border: "1px solid rgba(255,107,53,0.15)", fontSize: 11, color: "#FF6B35", fontWeight: 600, marginBottom: 12, letterSpacing: 1 }}>BACKTEST</div>
-          <h2 style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 800, marginBottom: 8 }}>6년 전에 시작했다면?</h2>
-          <p style={{ fontSize: "clamp(12px,1.4vw,15px)", color: "#6b6b7e" }}>균형형 프로파일 · 월 1회 리밸런싱 · 배당 재투자 포함</p>
-        </div>
-        <div className="gc cs" style={{ padding: 32, display: "flex", gap: 32, alignItems: "center" }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <svg viewBox="0 0 500 220" style={{ width: "100%" }}>
-              {[50, 100, 150, 200].map(y => (<g key={y}><line x1="40" y1={220 - y} x2="480" y2={220 - y} stroke="rgba(255,255,255,0.04)" /><text x="35" y={224 - y} textAnchor="end" fill="#4a4a5e" fontSize="10">{y}%</text></g>))}
-              {BACKTEST.map((d, i) => (<text key={i} x={40 + i * 73} y={218} textAnchor="middle" fill="#6b6b7e" fontSize="10">{d.year}</text>))}
-              <polyline fill="none" stroke="#4a4a5e" strokeWidth="1.5" strokeDasharray="4,4" points={BACKTEST.map((d, i) => `${40 + i * 73},${220 - d.bank}`).join(" ")} />
-              <polyline className="cl" fill="none" stroke="#4a90d9" strokeWidth="2" points={BACKTEST.map((d, i) => `${40 + i * 73},${220 - d.sp}`).join(" ")} />
-              <polyline className="cl" fill="none" stroke="url(#gr)" strokeWidth="3" points={BACKTEST.map((d, i) => `${40 + i * 73},${220 - d.ds}`).join(" ")} />
-              <defs><linearGradient id="gr" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#FF6B35" /><stop offset="100%" stopColor="#FF2E63" /></linearGradient></defs>
-              <text x="482" y={220 - 248 + 4} fill="#FF6B35" fontSize="12" fontWeight="800">+148%</text>
-              <text x="482" y={220 - 198 + 4} fill="#4a90d9" fontSize="10">+98%</text>
-              <text x="482" y={220 - 116 + 4} fill="#4a4a5e" fontSize="10">+16%</text>
-            </svg>
-          </div>
-          <div style={{ minWidth: 200 }}>
-            {[{ n: "DeepStock 균형형", r: "+148%", c: "16.3%", co: "#FF6B35", b: true }, { n: "S&P500 단순보유", r: "+98%", c: "12.1%", co: "#4a90d9", b: false }, { n: "은행 예금", r: "+16%", c: "2.5%", co: "#4a4a5e", b: false }].map((l, i) => (
-              <div key={i} style={{ padding: "14px 0", borderBottom: i < 2 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                  <div style={{ width: 12, height: 3, borderRadius: 2, background: l.co }} />
-                  <span style={{ fontSize: 13, fontWeight: l.b ? 700 : 500, color: l.b ? "#e8e8ed" : "#8b8b9e" }}>{l.n}</span>
-                </div>
-                <div style={{ display: "flex", gap: 16, paddingLeft: 20 }}>
-                  <div><span style={{ fontSize: 20, fontWeight: 800, color: l.co }}>{l.r}</span><span style={{ fontSize: 10, color: "#6b6b7e", marginLeft: 4 }}>누적</span></div>
-                  <div><span style={{ fontSize: 14, fontWeight: 600, color: "#8b8b9e" }}>{l.c}</span><span style={{ fontSize: 10, color: "#6b6b7e", marginLeft: 4 }}>연평균</span></div>
-                </div>
-              </div>
-            ))}
-            <div style={{ marginTop: 14, padding: 10, borderRadius: 8, background: "rgba(255,255,255,0.02)", fontSize: 10, color: "#4a4a5e", lineHeight: 1.6 }}>※ 과거 시뮬레이션이며 미래 수익을 보장하지 않습니다</div>
-          </div>
-        </div>
+        <BacktestChart />
       </section>
 
       <div className="gl" />
